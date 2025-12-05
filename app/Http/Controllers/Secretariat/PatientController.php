@@ -1,0 +1,311 @@
+<?php
+
+namespace App\Http\Controllers\Secretariat;
+
+use App\Repositories\SmsRepository;
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Patient;
+use App\Models\Payment;
+use App\Models\Admission;
+use App\Models\Secretaire;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\TypeAssurance;
+use App\Models\PassagePatient;
+use Illuminate\Validation\Rule;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+
+class PatientController extends Controller
+{
+    private static $ind = "225";
+
+    public function list()
+    {
+
+        $hospital = Auth::user()->secretariat->hospital_id;
+        $patients = Patient::whereHas('passage', function ($query) use ($hospital) {
+                $query->where('hospital_id', $hospital);
+            })
+            ->where('status', 1)
+            ->with('user')
+            ->with('lieuNaissance')
+            ->with('residenceActuelle')
+            ->orderByDESC('created_at')
+            ->get();
+
+        return view("users.secretariat.patient.list", compact('patients'));
+    }
+
+    public function create()
+    {
+        return view("users.secretariat.patient.create");
+    }
+
+    public function updatePatient(Request $request, $id)
+    {
+        $patient = Patient::findOrFail($id);
+        $user = User::findOrFail($patient->user->id);
+
+        $request->validate([
+            'email_up' => ['nullable'],
+            'residence_actuelle_up' => 'required',
+            'situation_matrimoniale_up' => 'required',
+            'type_piece_up' => 'required',
+            'numero_identite' => ['nullable', Rule::unique('patients')->ignore($patient->id)],
+            'telephone' => ['required', Rule::unique('patients')->ignore($patient->id)],
+            'contact2' => ['nullable', Rule::unique('patients')->ignore($patient->id)],
+
+            'admission_patient_up' => 'required',
+
+            'prestation_service_id' => 'required_if:admission_patient_up,Oui',
+            'infirmier_id' => 'required_if:admission_patient_up,Oui',
+            'motif_consultation' => 'required_if:admission_patient_up,Oui',
+
+        ]);
+
+        // Effectuez la mise à jour des informations du patient
+        $user->email = $request->email_up;
+        $patient->no_assurance = $request->no_assurance_up;
+        $patient->profession = $request->profession_up;
+        $patient->residence_habituelle_id = $request->residence_habituelle_up;
+        $patient->residence_actuelle_id = $request->residence_actuelle_up;
+        $patient->contact2 = $request->contact2;
+        $patient->ethnie = $request->ethnie_up;
+        $patient->type_piece = $request->type_piece_up;
+        $patient->numero_identite = $request->numero_identite_up;
+        $patient->img_url = $request->img_url;
+        $patient->situation_matrimoniale = $request->situation_matrimoniale_up;
+        $patient->telephone = $request->telephone;
+        $patient->address = $request->address_up;
+        $patient->nbre_enfant = $request->nbre_enfant_up ?? 0;
+        $patient->nom_personne_cas_urgence = $request->nom_personne_cas_urgence_up;
+        $patient->telephone_personne_cas_urgence = $request->telephone_personne_cas_urgence_up;
+        $patient->lien_personne_cas_urgence = $request->lien_personne_cas_urgence_up;
+
+        $user->save();
+        $patient->save();
+
+        //specifié le passage du patient dans l'hopital
+        if (!PassagePatient::where('hospital_id', auth()->user()->secretariat->hospital_id)->where('patient_id', $patient->id)->exists()) {
+            $passage = new PassagePatient();
+            $passage->libelle = 'Passage compte';
+            $passage->hospital_id = auth()->user()->secretariat->hospital_id;
+            $passage->patient_id = $patient->id;
+            $passage->date = date('Y-m-d');
+            $passage->save();
+        }
+
+        $secretaire = Secretaire::where('user_id', auth()->user()->id)->first();
+
+        //verifer l'admission
+        if ($request->admission_patient_up == 'Oui') {
+            $admission = Admission::create([
+                'code_admission' => codeAdmission(),
+                'date_admission' => Carbon::now()->format('Y-m-d H:i:s'),
+                'secretaire_id' => $secretaire->id,
+                'hospital_id' => $secretaire->hospital->id,
+                'patient_id' => $patient->id,
+                'doctor_id' => $request->doctor_id ?? null,
+                'infirmier_id' => $request->infirmier_id ?? null,
+                'caissiere_id' => null,
+                'prestation_hopital_id' => $request->prestation_service_id,
+                'type_admission' => $request->type_admission_id,
+                'mode_entree' => $request->mode_entree,
+                'montant' => $request->montant,
+                'montant_normal' => $request->montant,
+                'motif_consultation' => $request->motif_consultation,
+            ]);
+
+            //save payment
+            $payment = new Payment();
+            $payment->type = 'admission';
+            $payment->date = Carbon::now()->format('Y-m-d');
+            $payment->prix = $request->montant;
+            $payment->prix_normal = $request->montant;
+            $payment->hospital_id = $secretaire->hospital->id;
+            $payment->admission_id = $admission->id;
+            $payment->save();
+        }
+        // Retourner une réponse JSON
+        return response()->json(['success' => 'Patient mis à jour avec succès']);
+
+    }
+    public function detail($id)
+    {
+        $patient = Patient::find($id);
+        $type_assurances = TypeAssurance::get();
+        return view('users.secretariat.patient.detail', compact('patient', 'type_assurances'));
+    }
+
+    public function searchPatients(Request $request)
+    {
+        $telephone = $request->input('telephone');
+        $fullname = $request->input('fullname');
+        $birth_date = $request->input('birth_date');
+
+        $data = Patient::query();
+
+        if ($telephone) {
+            $data->where('telephone', $telephone);
+        }
+
+        if ($fullname) {
+            $fullname = explode(" ", $request->input('fullname'), 2);
+            $nom = $fullname[0];
+            $pnom = $fullname[1];
+            $data->whereHas('user', function ($q) use ($nom, $pnom) {
+                $q->where('name', 'like', '%' . $nom . '%')
+                    ->where('prenom', 'like', '%' . $pnom . '%');
+            });
+        }
+
+        if ($birth_date) {
+            $data->where('birth_date', $birth_date);
+        }
+
+        $patients = $data->with('user')->with('lieuNaissance')->with('residenceActuelle')->with('residenceHabituelle')->get();
+
+        return response()->json(['patients' => $patients]);
+    }
+    public function addPatient(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'prenom' => 'required',
+            'email' => 'nullable|email|unique:users',
+            'gender' => 'required',
+            'birth_date' => 'required',
+            'residence_actuelle' => 'required',
+            'lieu_de_naissance' => 'required',
+            'pays' => 'required',
+            'autre_pays' => 'required_if:pays,autre',
+            'situation_matrimoniale' => 'required',
+            'type_piece' => 'required',
+            'numero_identite' => 'nullable|required_with:type_piece|unique:patients',
+            'telephone' => 'required|unique:patients',
+            'contact2' => 'nullable|unique:patients',
+            'admission_patient' => 'required',
+            'prestation_service_id' => 'required_if:admission_patient,Oui',
+            'infirmier_id' => 'required_if:admission_patient,Oui',
+            'motif_consultation' => 'required_if:admission_patient,Oui',
+            'img_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $password = '1234';
+        $user = User::create([
+            'name' => $request->name,
+            'prenom' => $request->prenom,
+            'email' => $request->email,
+            'role_as' => 'patient',
+            'password' => Hash::make($password),
+        ]);
+
+        if ($request->hasFile('img_url')) {
+            $file_name = Carbon::now()->timestamp . '.' . $request->img_url->extension();
+            $request->img_url->storeAs('images/patients/', $file_name);
+            $file_path = 'src-files/images/patients/' . $file_name;
+        }
+
+        $secretaire = Secretaire::where('user_id', auth()->user()->id)->first();
+        $pays = ($request->pays == 'Côte d\'Ivoire') ? $request->pays : $request->autre_pays;
+        $code = ($request->pays == 'Côte d\'Ivoire') ? 225 : 100;
+        $dataNaissRef = dateNaiss($request->birth_date);
+        $countNaissRef = countNaiss($request->birth_date);
+
+        $patient = Patient::create([
+            'user_id' => $user->id,
+            'secretaire_id' => $secretaire->id,
+            'hospital_id' => $secretaire->hospital->id,
+            'gender' => $request->gender,
+            'code_patient' => "DM$dataNaissRef$countNaissRef$code",
+            'no_assurance' => $request->no_assurance,
+            'profession' => $request->profession,
+            'lieu_de_naissance_id' => $request->lieu_de_naissance,
+            'birth_date' => $request->birth_date,
+            'residence_habituelle_id' => $request->residence_habituelle,
+            'residence_actuelle_id' => $request->residence_actuelle,
+            'contact2' => $request->contact2,
+            'type_piece' => $request->type_piece,
+            'numero_identite' => $request->numero_identite,
+            'img_url' => $file_path ?? null,
+            'situation_matrimoniale' => $request->situation_matrimoniale,
+            'ethnie' => $request->ethnie,
+            'telephone' => $request->telephone,
+            'country' => $pays,
+            'address' => $request->address,
+            'nbre_enfant' => $request->nbre_enfant ?? 0,
+            'nom_personne_cas_urgence' => $request->nom_personne_cas_urgence,
+            'telephone_personne_cas_urgence' => $request->telephone_personne_cas_urgence,
+            'lien_personne_cas_urgence' => $request->lien_personne_cas_urgence,
+            'nom_personne2_cas_urgence' => $request->nom_personne2_cas_urgence,
+            'telephone_personne2_cas_urgence' => $request->telephone_personne2_cas_urgence,
+            'lien_personne2_cas_urgence' => $request->lien_personne2_cas_urgence,
+            'status' => 1,
+        ]);
+
+        if ($request->admission_patient == 'Oui') {
+            $admission = Admission::create([
+                'code_admission' => codeAdmission(),
+                'date_admission' => Carbon::now()->format('Y-m-d H:i:s'),
+                'secretaire_id' => $secretaire->id,
+                'hospital_id' => $secretaire->hospital->id,
+                'patient_id' => $patient->id,
+                'doctor_id' => $request->doctor_id ?? null,
+                'infirmier_id' => $request->infirmier_id ?? null,
+                'caissiere_id' => null,
+                'prestation_hopital_id' => $request->prestation_service_id,
+                'type_admission' => $request->type_admission_id,
+                'mode_entree' => $request->mode_entree,
+                'montant' => $request->montant,
+                'montant_normal' => $request->montant,
+                'motif_consultation' => $request->motif_consultation,
+            ]);
+
+            // Enregistrement du paiement
+            $payment = new Payment();
+            $payment->type = 'admission';
+            $payment->date = Carbon::now()->format('Y-m-d');
+            $payment->prix = $request->montant;
+            $payment->prix_normal = $request->montant;
+            $payment->hospital_id = $secretaire->hospital->id;
+            $payment->admission_id = $admission->id;
+            $payment->save();
+        }
+
+        // Enregistrement du passage patient
+
+        if ($patient) {
+            $passage = new PassagePatient();
+            $passage->libelle = 'Création du compte';
+            $passage->hospital_id = auth()->user()->secretariat->hospital_id;
+            $passage->date = date('Y-m-d');
+            $passage->patient_id = $patient->id;
+            $passage->save();
+
+            $message = "Inscription confirmée pour M/Mme $user->name $user->prenom . Utilisez le DM: $patient->code_patient pour vous connecter.";
+
+            (new SmsRepository($patient->telephone, $message))->send();
+
+        }
+        return response()->json(['success' => 'Patient enregistré avec succès'], 200);
+    }
+
+    public function getPatient(Request $request)
+    {
+        $patientId = $request->input('patient_id');
+        $patient = Patient::with('user')->with('lieuNaissance')->with('residenceActuelle')->with('residenceHabituelle')->find($patientId);
+
+        return response()->json(['patient' => $patient]);
+    }
+}

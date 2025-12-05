@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Http\Livewire;
+
+use App\Models\Secretaire;
+use Livewire\Component;
+
+class SecretaireStatus extends Component
+{
+    public int $status;
+    public int $userId;
+
+    public function mount( int $status, int $userId): void
+    {
+        $this->status = $status;
+        $this->userId = $userId;
+    }
+
+    public function render()
+    {
+        return view('livewire.secretaire-status');
+    }
+    public function changeStatus()
+    {
+        $this->status = $this->status == 1 ? 0 : 1;
+
+        $user = Secretaire::find($this->userId);
+
+        $user->status = strval($this->status);
+        $user->save();
+
+        $message_type = '';
+        $message = '';
+
+        if($user->status == 1)
+        {
+            $message_type = 'success';
+            $message = 'Le compte de cette Secretaire a été activé.';
+        }else
+        {
+            $message_type = 'warning';
+            $message = 'Le compte de cette Secretaire a été désactivé.';
+        }
+
+
+        return to_route('secretaire.index')->with($message_type,$message);
+    }
+}
