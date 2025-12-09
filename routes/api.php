@@ -40,7 +40,9 @@ Route::prefix('v1/patient')->group( function () {
 
             Route::get('consultations', [DataController::class, 'consultations']);
             Route::get('declarations', [DataController::class, 'declarations']);
+            Route::post('rdv/create', [DataController::class, 'createRendezVous']);
             Route::get('rdv', [DataController::class, 'rendezVous']);
+             Route::get('doctors', [DataController::class, 'getDoctors']);
   
             Route::get('rdv/{id}', [DataController::class, 'deleteRendezVous']);
 

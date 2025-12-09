@@ -15,8 +15,10 @@ use App\Models\ServiceHospital;
 use App\Models\SubPrefecture;
 use App\Models\TypeConsultation;
 use App\Models\User;
+use App\Notifications\HospitalCreatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class HospitalController extends Controller
 {
@@ -66,7 +68,7 @@ class HospitalController extends Controller
         $user->password = bcrypt($request -> password);
         $user->save();
 
-        //save doctor
+        //save hospital
         $hospital = new Hospital();
 
         if($request -> hasFile('image'))
@@ -74,7 +76,6 @@ class HospitalController extends Controller
             $hospital->img_url = $this->uploadImage($request->image, 'hospital');
         }
         $hospital -> user_id = $user->id;
-
         $hospital -> reference =  $request -> reference;
         $hospital -> contact = $request -> contact;
         $hospital -> localite = $request -> address;
@@ -83,19 +84,15 @@ class HospitalController extends Controller
         $hospital -> nom_direction_generale = $request -> direction_generale ?? null;
         $hospital -> save();
 
-        $i = 0;
-        // // $consultation = ['Consultation', 'Consultation pré natale', 'Consultation post natale', 'Accouchement'];
-        // while ($i<4)
-        // {
-        //     $dep = new ServiceHospital();
-        //     $dep->hospital_id = $hospital->id;
-        //     $dep->service_id = $i+1;
-        //     $dep->save();
-        //     $i++;
-        // }
+        // Envoyer l'email de confirmation
+        try {
+            $user->notify(new HospitalCreatedNotification($hospital, $user, $request->password));
+        } catch (\Exception $e) {
+            // Vous pouvez logger l'erreur ici si nécessaire
+            Log::error('Erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
+        }
 
-                return redirect()->route('super.hospital.index')->with('success', 'Hopital ajouté avec succès.');
-
+        return redirect()->route('super.hospital.index')->with('success', 'Hopital ajouté avec succès.');
     }
 
     public function update(UpdateHospitalRequest $request, $id)

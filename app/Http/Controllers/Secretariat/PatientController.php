@@ -15,9 +15,11 @@ use App\Models\TypeAssurance;
 use App\Models\PassagePatient;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use App\Notifications\PatientRegistrationNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -219,9 +221,10 @@ class PatientController extends Controller
 
         $secretaire = Secretaire::where('user_id', auth()->user()->id)->first();
         $pays = ($request->pays == 'Côte d\'Ivoire') ? $request->pays : $request->autre_pays;
-        $code = ($request->pays == 'Côte d\'Ivoire') ? 225 : 100;
         $dataNaissRef = dateNaiss($request->birth_date);
         $countNaissRef = countNaiss($request->birth_date);
+        $code = ($request->pays == 'Côte d\'Ivoire') ? 225 : 100;
+        $codePatient = "DM$dataNaissRef$countNaissRef$code";
 
         $patient = Patient::create([
             'user_id' => $user->id,
@@ -243,6 +246,7 @@ class PatientController extends Controller
             'ethnie' => $request->ethnie,
             'telephone' => $request->telephone,
             'country' => $pays,
+            'code_patient' => $codePatient,
             'address' => $request->address,
             'nbre_enfant' => $request->nbre_enfant ?? 0,
             'nom_personne_cas_urgence' => $request->nom_personne_cas_urgence,
@@ -296,6 +300,16 @@ class PatientController extends Controller
             $message = "Inscription confirmée pour M/Mme $user->name $user->prenom . Utilisez le DM: $patient->code_patient pour vous connecter.";
 
             (new SmsRepository($patient->telephone, $message))->send();
+
+            if ($user->email) {
+                try {
+                    $user->notify(new PatientRegistrationNotification($patient, $user, $codePatient, $password));
+                } catch (\Exception $e) {
+                    // Logger l'erreur sans interrompre le processus
+                    Log::error('Erreur lors de l\'envoi de l\'email patient : ' . $e->getMessage());
+                    // Optionnel: ajouter un message pour l'administrateur
+                }
+            }
 
         }
         return response()->json(['success' => 'Patient enregistré avec succès'], 200);

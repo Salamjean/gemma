@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\OneSignalToken;
 use App\Models\Patient;
 use App\Models\User;
+use App\Notifications\SendPatientOtpNotification;
 use App\Repositories\SmsRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -17,85 +19,305 @@ class AuthController extends Controller
     //login
     public function login(Request $request)
     {
+        Log::info('Tentative de login', ['code' => $request->code]);
 
         $request->validate([
             'code' => 'required',
         ]);
 
-        $patient = Patient::where('code_patient', $request->code)->with('user')->first();
+        $patient = Patient::where('code_patient', $request->code)
+            ->with('user')
+            ->first();
+
+        Log::info('Recherche patient par code_patient', ['patient' => $patient ? $patient->id : null]);
 
         if (!$patient) {
-            $patientT = Patient::where('telephone', $request->code)->with('user')->first();
+            $patientT = Patient::where('telephone', $request->code)
+                ->with('user')
+                ->first();
+
+            Log::info('Recherche patient par téléphone', ['patientT' => $patientT ? $patientT->id : null]);
+
             if (!$patientT) {
+                Log::warning('Patient introuvable', ['code' => $request->code]);
                 return response([
-                    'message' => 'Vous n\'etes pas patient!'
-                ], 403);
+                    'message' => 'Patient non trouvé!'
+                ], 404);
             }
             $patient = $patientT;
         }
 
-        $user = User::where('id', $patient->user->id)->where('role_as', 'patient')->first();
+        $user = User::where('id', $patient->user->id)
+            ->where('role_as', 'patient')
+            ->first();
 
-        if (!$user)
+        Log::info('Recherche utilisateur associé', ['user' => $user ? $user->id : null]);
+
+        if (!$user) {
+            Log::error('Utilisateur introuvable pour le patient', ['patient_id' => $patient->id]);
             return response(['message' => 'Utilisateur introuvable!'], 403);
+        }
 
-        if (!$patient->telephone)
-            return response(['message' => 'Prière d\'aller dans un etablessement de santé avec votre code patient pour l\'ajout de votre numéro de téléphone!'], 403);
+        // Vérifier si l'utilisateur a un email
+        if (!$user->email) {
+            Log::warning('Patient sans email', ['patient_id' => $patient->id]);
+            return response([
+                'message' => 'Veuillez contacter l\'administration pour ajouter votre adresse email.'
+            ], 403);
+        }
 
-        $code = 1234;
-        $password = "$code";
+        // Générer un code OTP aléatoire de 6 chiffres
+        $otpCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        $message = "Bonjour M/Mme $user->name $user->prenom, veuillez utiliser le code ci-dessous pour vous connecter.\nCode : $code";
-        (new SmsRepository($patient->telephone, $message))->send();
+        // Définir la date d'expiration (10 minutes)
+        $otpExpiresAt = now()->addMinutes(10);
 
-        $user->update(['password' => bcrypt($password)]);
+        // Sauvegarder l'OTP dans la table patient
+        $patient->update([
+            'otp_code' => $otpCode,
+            'otp_expires_at' => $otpExpiresAt
+        ]);
+
+        // Envoyer l'OTP par email
+        try {
+            $user->notify(new SendPatientOtpNotification($otpCode, $user->name . ' ' . $user->prenom));
+            Log::info('OTP envoyé par email', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'otp_code' => $otpCode
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'envoi de l\'OTP par email', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+            return response([
+                'message' => 'Erreur lors de l\'envoi de l\'OTP. Veuillez réessayer.'
+            ], 500);
+        }
 
         return response([
-            'password' => $password,
+            'message' => 'Code OTP envoyé avec succès à votre adresse email.',
+            'code' => $request->code // Retourner l'identifiant pour la confirmation
         ], 200);
     }
 
+
     public function confirmLogin(Request $request)
     {
-        $request->validate([
-            'code' => 'required',
-            'password' => 'required',
-        ]);
+        Log::info('=== DÉBUT CONFIRMATION LOGIN PATIENT ===');
+        Log::info('Données reçues:', $request->all());
 
-        // verif patient
-        $patient = Patient::where('code_patient', $request->code)->with('user')->first();
+        // Validation
+        try {
+            $request->validate([
+                'code' => 'required',
+                'password' => 'required|digits:6',
+            ]);
+            Log::info('Validation réussie');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Erreur de validation:', [
+                'erreurs' => $e->errors(),
+                'donnees' => $request->all()
+            ]);
+            return response([
+                'message' => 'Erreur de validation',
+                'errors' => $e->errors()
+            ], 422);
+        }
+
+        // Déterminer quel champ utiliser pour l'OTP
+        $otp = $request->password;
+        Log::info('OTP extrait:', ['otp' => $otp]);
+
+        // Recherche patient par code_patient
+        Log::info('Recherche patient par code_patient:', ['code' => $request->code]);
+        $patient = Patient::where('code_patient', $request->code)
+            ->with('user')
+            ->first();
 
         if (!$patient) {
-            $patientT = Patient::where('telephone', $request->code)->with('user')->first();
-            if (!$patientT) {
+            Log::info('Patient non trouvé par code_patient, recherche par téléphone');
+            $patient = Patient::where('telephone', $request->code)
+                ->with('user')
+                ->first();
+
+            if (!$patient) {
+                Log::warning('Patient introuvable:', [
+                    'identifiant' => $request->code,
+                    'type' => 'code_patient/telephone'
+                ]);
                 return response([
-                    'message' => 'Vous n\'etes pas patient!'
+                    'message' => 'Identifiant incorrect!'
                 ], 403);
             }
-            $patient = $patientT;
+            Log::info('Patient trouvé par téléphone:', ['patient_id' => $patient->id]);
+        } else {
+            Log::info('Patient trouvé par code_patient:', ['patient_id' => $patient->id]);
         }
 
-        $user = User::where('id', $patient->user->id)->where('role_as', 'patient')->first();
+        Log::info('Informations patient:', [
+            'id' => $patient->id,
+            'code_patient' => $patient->code_patient,
+            'telephone' => $patient->telephone,
+            'otp_code' => $patient->otp_code,
+            'otp_expires_at' => $patient->otp_expires_at,
+            'user_id' => $patient->user_id
+        ]);
 
-        //if user return 403
+        // Vérifier l'utilisateur
+        if (!$patient->user) {
+            Log::error('Utilisateur non trouvé pour le patient:', ['patient_id' => $patient->id]);
+            return response([
+                'message' => 'Utilisateur non trouvé!'
+            ], 403);
+        }
+
+        $user = User::where('id', $patient->user->id)
+            ->where('role_as', 'patient')
+            ->first();
+
         if (!$user) {
+            Log::error('Utilisateur patient non trouvé:', [
+                'user_id' => $patient->user->id,
+                'role_attendu' => 'patient'
+            ]);
             return response([
-                'message' => 'Vous n\'etes pas patient!'
+                'message' => 'Utilisateur non trouvé!'
             ], 403);
         }
 
-        $attrs['id'] = $user->id;
-        $attrs['password'] = $request->password;
+        Log::info('Informations utilisateur:', [
+            'user_id' => $user->id,
+            'nom' => $user->name,
+            'prenom' => $user->prenom,
+            'email' => $user->email,
+            'role' => $user->role_as
+        ]);
 
-        if (!Auth::attempt($attrs)) {
+        // Vérifications OTP
+        if (!$patient->otp_code) {
+            Log::warning('Aucun OTP stocké pour le patient:', ['patient_id' => $patient->id]);
             return response([
-                'message' => 'Code OTP incorret!'
+                'message' => 'Aucun code OTP actif. Veuillez en demander un nouveau.'
             ], 403);
         }
+
+        if (!$patient->otp_expires_at) {
+            Log::warning('Pas de date d\'expiration OTP:', ['patient_id' => $patient->id]);
+            return response([
+                'message' => 'Erreur de configuration OTP. Veuillez en demander un nouveau.'
+            ], 403);
+        }
+
+        // Vérifier l'expiration
+        $now = now();
+        $expiresAt = $patient->otp_expires_at;
+
+        Log::info('Vérification expiration OTP:', [
+            'maintenant' => $now->format('Y-m-d H:i:s'),
+            'expire_le' => $expiresAt,
+            'expire_dans' => $now->diffInMinutes($expiresAt) . ' minutes'
+        ]);
+
+        if ($now->gt($expiresAt)) {
+            Log::warning('OTP expiré:', [
+                'patient_id' => $patient->id,
+                'otp_code' => $patient->otp_code,
+                'expire_le' => $expiresAt
+            ]);
+            return response([
+                'message' => 'Le code OTP a expiré. Veuillez en demander un nouveau.'
+            ], 403);
+        }
+
+        // Vérifier la correspondance OTP
+        Log::info('Comparaison OTP:', [
+            'otp_reçu' => $otp,
+            'otp_stocké' => $patient->otp_code,
+            'correspondance' => $patient->otp_code === $otp
+        ]);
+
+        if ($patient->otp_code !== $otp) {
+            Log::warning('OTP incorrect:', [
+                'patient_id' => $patient->id,
+                'otp_reçu' => $otp,
+                'otp_attendu' => $patient->otp_code
+            ]);
+            return response([
+                'message' => 'Code OTP incorrect!'
+            ], 403);
+        }
+
+        Log::info('OTP validé avec succès');
+
+        // Effacer l'OTP après utilisation
+        try {
+            $patient->update([
+                'otp_code' => null,
+                'otp_expires_at' => null
+            ]);
+            Log::info('OTP effacé de la base de données');
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'effacement OTP:', [
+                'patient_id' => $patient->id,
+                'erreur' => $e->getMessage()
+            ]);
+            // Continuer malgré l'erreur
+        }
+
+        // Authentifier l'utilisateur
+        try {
+            Auth::login($user);
+            Log::info('Utilisateur authentifié avec succès:', ['user_id' => $user->id]);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'authentification:', [
+                'user_id' => $user->id,
+                'erreur' => $e->getMessage()
+            ]);
+            return response([
+                'message' => 'Erreur d\'authentification'
+            ], 500);
+        }
+
+        // Créer le token
+        try {
+            $token = $user->createToken('patient_token')->plainTextToken;
+            Log::info('Token créé avec succès');
+        } catch (\Exception $e) {
+            Log::error('Erreur création token:', [
+                'user_id' => $user->id,
+                'erreur' => $e->getMessage()
+            ]);
+            return response([
+                'message' => 'Erreur lors de la création du token'
+            ], 500);
+        }
+
+        // Récupérer les données complètes du patient
+        try {
+            $patientData = Patient::where('id', $patient->id)
+                ->with(['user' => function ($query) {
+                    $query->select('id', 'name', 'prenom', 'email');
+                }])
+                ->first();
+        } catch (\Exception $e) {
+            Log::error('Erreur récupération données patient:', [
+                'patient_id' => $patient->id,
+                'erreur' => $e->getMessage()
+            ]);
+            $patientData = $patient;
+        }
+
+        Log::info('=== CONFIRMATION LOGIN RÉUSSIE ===', [
+            'patient_id' => $patient->id,
+            'user_id' => $user->id
+        ]);
 
         return response()->json([
-            'patient' => Patient::where('id', Auth::user()->patient->id)->with('user')->first(),
-            'token' => auth()->user()->createToken('secret')->plainTextToken,
+            'patient' => $patientData,
+            'token' => $token,
+            'message' => 'Connexion réussie!'
         ], 200);
     }
 
