@@ -282,7 +282,7 @@
                     <br />
                 </div>
             </div>
-            <!-- Section Empreintes Digitales -->
+            <!-- Section Empreintes Digitales
             <div class="box-body ribbon-box">
                 <div class="ribbon ribbon-success rounded5">Enregistrement Biométrique</div>
                 <br /><br /><br />
@@ -377,7 +377,7 @@
                 </div>
             </div>
 
-            <input type="hidden" name="fingerprint_device" id="fingerprint_device" value="DigitalPersona U.are.U 4500">
+            <input type="hidden" name="fingerprint_device" id="fingerprint_device" value="DigitalPersona U.are.U 4500"> -->
             <!-- Step 3 -->
             <div class="row mt-20" id="questAdd">
                 <div class="col-md-3">
