@@ -126,8 +126,8 @@
         </ul>
         
         <p style="margin-top: 30px;">
-            {{-- <a href="{{ url('https://patient.gemma-ci.com/login') }}" style="background-color: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;"> --}}
-            <a href="{{ url('http://localhost:3000/login') }}" style="background-color: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">
+            <a href="{{ url('https://patient.gemma-ci.com/login') }}" style="background-color: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">
+            <!-- <a href="{{ url('http://localhost:3000/login') }}" style="background-color: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;"> -->
                 Accéder à mon espace patient
             </a>
         </p>
