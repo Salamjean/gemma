@@ -11,27 +11,28 @@
 
     <title>{{ $title }}</title>
 
-	<!-- Vendors Style-->
-	<link rel="stylesheet" href="{{ asset('assets/src/css/vendors_css.css') }}">
+    <!-- Vendors Style-->
+    <link rel="stylesheet" href="{{ asset('assets/src/css/vendors_css.css') }}">
 
-	<!-- Style-->
-	<link rel="stylesheet" href="{{ asset('assets/src/css/style.css') }}">
-	<link rel="stylesheet" href="{{ asset('assets/src/css/skin_color.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" integrity="sha512-3tCem0NQxvvXP8EDNmZlL59PXSvNQOpnt1uxpT4sB8JepAC/lyr1uN8djpHflzy8WtwUtCXlEtOop2UB5d5zGA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Style-->
+    <link rel="stylesheet" href="{{ asset('assets/src/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/src/css/skin_color.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" crossorigin="anonymous">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <script src="https://kit.fontawesome.com/111032cd6f.js" crossorigin="anonymous"></script>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 
     <!-- Toast notification -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <link href="{{ asset('css/mobiscroll.css') }}" rel="stylesheet" />
     <script src="{{ asset('js/mobiscroll.js') }}"></script>
 
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- Personnal style -->
     @stack('css')
@@ -59,9 +60,11 @@
                             <div class="d-inline-block align-items-left ">
                                 <nav>
                                     <ol class="breadcrumb">
-                                        <li class="breadcrumb-item"><b href="#"><i class="fa-solid fa-home"></i></b></li>
+                                        <li class="breadcrumb-item"><b href="#"><i
+                                                    class="fa-solid fa-home"></i></b></li>
                                         <li class="breadcrumb-item active fs-5" aria-current="page">{{ $title }}
-                                        <span class="text-primary"> </span></li>
+                                            <span class="text-primary"> </span>
+                                        </li>
                                     </ol>
                                 </nav>
                             </div>
@@ -86,9 +89,11 @@
         .bg-s {
             background-image: url("{{ asset('assets/images/bg.jpg') }}");
         }
+
         .simplemenu {
             float: right;
         }
+
         .danger {
             color: red;
         }
@@ -113,17 +118,19 @@
     <script src="{{ asset('assets/src/js/pages/data-table.js') }}"></script>
     {{-- Form script  --}}
     <script src="{{ asset('assets/vendor_plugins/input-mask/jquery.inputmask.js') }}"></script>
-	<script src="{{ asset('assets/vendor_plugins/input-mask/jquery.inputmask.date.extensions.js') }}"></script>
-	<script src="{{ asset('assets/vendor_plugins/input-mask/jquery.inputmask.extensions.js') }}"></script>
-	<script src="{{ asset('assets/vendor_components/moment/min/moment.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor_plugins/input-mask/jquery.inputmask.date.extensions.js') }}"></script>
+    <script src="{{ asset('assets/vendor_plugins/input-mask/jquery.inputmask.extensions.js') }}"></script>
+    <script src="{{ asset('assets/vendor_components/moment/min/moment.min.js') }}"></script>
 
     <script src="{{ asset('assets/src/js/pages/advanced-form-element.js') }}"></script>
 
     <script src="{{ asset('assets/vendor_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
-    <script src="{{ asset('assets/vendor_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}">
+    </script>
     <script src="{{ asset('assets/vendor_components/fullcalendar/fullcalendar.js') }}"></script>
 
-    <script src="{{ asset('assets/vendor_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') }}">
+    </script>
     <script src="{{ asset('assets/vendor_plugins/timepicker/bootstrap-timepicker.min.js') }}"></script>
     <!-- Personnal script -->
     <script src="{{ asset('assets/src/js/pages/calendar.js') }}"></script>

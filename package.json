@@ -13,6 +13,11 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
-        "dropzone": "^6.0.0-beta.2"
+        "@serialport/parser-readline": "^13.0.0",
+        "dropzone": "^6.0.0-beta.2",
+        "laravel-echo": "^2.2.6",
+        "pusher-js": "^8.4.0",
+        "serialport": "^13.0.0",
+        "ws": "^8.18.3"
     }
 }

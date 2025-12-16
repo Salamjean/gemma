@@ -55,6 +55,7 @@ Route::middleware(['auth'])->group(function () {
                 Route::post('formulaire', 'ConsultationController@store')->name('formulaire.store');
 
                 Route::get('formulaire/issue/{id}', 'ConsultationController@formulaireIssue')->name('formulaire.issue');
+                Route::get('patient/{id}/card', 'ConsultationController@patientCard')->name('patient.card');
             });
             //suivi hospitalisation
             Route::prefix('suivi')->name('suivi.')->group(function () {

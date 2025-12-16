@@ -46,7 +46,7 @@
 
                                 <td>
                                     @if ($patient->img_url != null)
-        								<img src="{{ asset('assets/uploads/patient/'. $patient->img_url) }}"
+        								<img src="{{ asset('public/assets/uploads/patient/'. $patient->img_url) }}"
         									class="rounded-circle" alt="Photo de profil" style="width:48px; height:48px" />
         							@else
         							    @if ($patient->gender == 'masculin')
@@ -71,6 +71,7 @@
                                 </td>
                                 <td class="text-center">
                                     <a href="{{ route('secretariat.patient.detail', $patient->id) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Détail"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a href="javascript:void(0)" onclick="openCardModal('{{ route('secretariat.patient.card', $patient->id) }}')" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Carte numérique"><i class="fa-solid fa-id-card"></i></a>
                                 </td>
                             </tr>
                         @endforeach
@@ -81,9 +82,57 @@
       </div>
     </div>
 </div>
+
+</div>
 @endsection
 @push('js')
     @livewireScripts()
     <script src="{{ asset('assets/vendor_plugins/iCheck/icheck.min.js') }}"></script>
     <script src="{{ asset('assets/src/js/pages/advanced-form-element.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function openCardModal(url) {
+            Swal.fire({
+                html: '<div id="swal-card-container" style="min-height: 600px; overflow: hidden;"></div>',
+                width: '1500px',
+                maxWidth: '95vw',
+                padding: '2em',
+                background: 'transparent',
+                showConfirmButton: false,
+                showCloseButton: true,
+                didOpen: () => {
+                    Swal.getPopup().style.overflow = 'hidden';
+                    Swal.showLoading();
+                    fetch(url, { headers: {'X-Requested-With': 'XMLHttpRequest'} })
+                    .then(response => {
+                        if(!response.ok) throw new Error("Network response was not ok");
+                        return response.text();
+                    })
+                    .then(html => {
+                        Swal.hideLoading();
+                        const container = document.getElementById('swal-card-container');
+                        container.innerHTML = html;
+                        
+                        // Re-execute scripts (QR Code etc)
+                        const scripts = container.querySelectorAll("script");
+                        scripts.forEach(oldScript => {
+                            const newScript = document.createElement("script");
+                            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                            oldScript.parentNode.replaceChild(newScript, oldScript);
+                        });
+                    })
+                    .catch(err => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erreur',
+                            text: 'Impossible de charger la carte.',
+                            confirmButtonColor: '#3596f7'
+                        });
+                        console.error(err);
+                    });
+                }
+            });
+        }
+    </script>
 @endpush

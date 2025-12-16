@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\CustomAuthController;
+use App\Http\Controllers\FingerprintController;
 use App\Http\Controllers\PostConsultationController;
 use Illuminate\Support\Facades\Route;
 

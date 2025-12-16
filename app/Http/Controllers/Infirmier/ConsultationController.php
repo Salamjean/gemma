@@ -56,11 +56,19 @@ class ConsultationController extends Controller
         //$consultation->gly_nn_jeun = $data["gly_nn_jeun"] ?? '';
         //$consultation->perimetre_brach = $data["perimetre_brach"] ?? '';
 
-        $consultation->status_inf =  1;
+        // Assigner issue_consultation_id si fourni, sinon mettre une valeur par défaut
+        $consultation->issue_consultation_id = $data["issue_consultation"] ?? null;
+
+        // Si observation_infirmiere est fournie, l'assigner
+        if (isset($data["observation_infirmiere"])) {
+            $consultation->observation_infirmiere = $data["observation_infirmiere"];
+        }
+
+        $consultation->status_inf = 1;
         $consultation->save();
 
 
-            return redirect()->route('dashboard')->with('success', 'Votre patient est en attente chez le medecin.');
+        return redirect()->route('dashboard')->with('success', 'Votre patient est en attente chez le medecin.');
 
     }
 
@@ -86,4 +94,12 @@ class ConsultationController extends Controller
         return view('users.infirmier.consultation.detail', compact('consultation'));
     }
 
+    public function patientCard(Request $request, $id)
+    {
+        $patient = \App\Models\Patient::with(['user', 'hospital'])->findOrFail($id);
+        if ($request->ajax()) {
+            return view('users.secretariat.patient.card_inner', compact('patient'));
+        }
+        return view('users.secretariat.patient.card', compact('patient'));
+    }
 }

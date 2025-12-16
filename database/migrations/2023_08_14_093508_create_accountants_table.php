@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('numero_piece')->nullable();
             $table->string('contact');
             $table->string('address')->nullable();
-            $table->integer('status')->default(1);
+            $table->integer('status')->default(0);
             $table->string('img_url')->nullable();
             $table->integer('delete')->default(0);
             

@@ -128,7 +128,7 @@ class DataController extends Controller
 
     public function show()
     {
-        return response(['patient' => Patient::where('id', Auth::user()->patient->id)->with('user', 'habitualResidence', 'currentResidence', 'lieuNaissance')->first()], 200);
+        return response(['patient' => Patient::where('id', Auth::user()->patient->id)->with('user', 'habitualResidence', 'currentResidence', 'lieuNaissance', 'hospital')->first()], 200);
     }
 
     public function cities()

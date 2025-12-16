@@ -1,6 +1,7 @@
 @extends('layouts.dashboard', ['title' => 'Ajouter un Patient'])
 
 @section('content')
+   
     <div class="row">
         <div class="col-12">
             <!-- Validation wizard -->

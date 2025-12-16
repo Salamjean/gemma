@@ -54,7 +54,7 @@ class ConsultationController extends Controller
         $title = $this->instanceIssue()->formulaireIssue($mode_sortie);
         $drugsHospital = DrugHospital::where('hospital_id', auth()->user()->doctor->hospital_id)->get();
         $drugs = Drug::all();
-        return view('users.doctor.consultation.formulaire.formulaire_issue', ['type' => $mode_sortie, 'title' => $title, 'drugsHospital' => $drugsHospital ,'drugs' => $drugs, 'consultation' => $this->instance()->show($consultation)]);
+        return view('users.doctor.consultation.formulaire.formulaire_issue', ['type' => $mode_sortie, 'title' => $title, 'drugsHospital' => $drugsHospital, 'drugs' => $drugs, 'consultation' => $this->instance()->show($consultation)]);
     }
 
     public function formulairePostConsultation($title, $mode_sortie, $consultation)
@@ -183,7 +183,7 @@ class ConsultationController extends Controller
                     "autre_antecedent_medical" => $request->autre_antecedent_medical,
                     "autre_antecedent_chirurgical" => $request->autre_antecedent_chirurgical,
                     "nom_operation" => $request->nom_operation,
-                   
+
                 ]);
         } else {
             //consultation
@@ -199,52 +199,52 @@ class ConsultationController extends Controller
             $consultationcurative = RegistreConsultationCurative::create([
                 "registre_id" => $registre->id,
                 "mode_entree" => $request->mode_entree,
-                    //"type_population" => $request->type_population,
-                    "motif_consultation" => $request->motif_consultation,
-                    "en_cours_de_scolarisation" => $request->en_cours_de_scolarisation,
-                    "tdr_paludisme" => $request->tdr_paludisme,
-                    "goutte_epaise" => $request->goutte_epaise,
-                    "milda_enfant_eligible" => $request->milda_enfant_eligible,
-                    "remise_milda_enfant" => $request->remise_milda_enfant,
-                    "cdip_propose" => $request->cdip_propose,
-                    "cdip_realise" => $request->cdip_realise,
-                    "code_depistage_client" => $request->code_depistage_client,
-                    "glycemie_a_jeun" => $request->glycemie_a_jeun,
-                    "glycemie_non_a_jeun" => $request->glycemie_non_a_jeun,
-                    "zcore" => $request->zscore,
-                    "temperature" => $request->temperature,
-                    "frequence_respiratoire" => $request->frequence_respiratoire,
-                    "ta" => $request->ta,
-                    "hta" => $request->hta,
-                    "pouls" => $request->pouls,
-                    "perimetre_brachial" => $request->perimetre_brachial,
-                    "perimetre_cranien" => $request->perimetre_cranien,
-                    "tuberculose" => $request->tuberculose,
-                    "traitement_medicamenteux" => $request->traitement_medicamenteux,
-                    "antecedent_medical" => $request->antecedent_medical,
-                    "antecedent_chirurgical" => $request->antecedent_chirurgical,
-                    "gyneco_obstetrico" => $request->gyneco_obstetrico,
-                    "ddr" => $request->ddr,
-                    "en_cours_de_grossesse" => $request->en_cours_de_grossesse,
-                    "description_grossesse" => $request->description_grossesse,
-                    "mode_de_vie" => $request->mode_de_vie,
-                    "tabac" => $request->tabac,
-                    "alcool" => $request->alcool,
-                    "taille" => $request->taille,
-                    "poids" => $request->poids,
-                    "traitement_medicamenteux" => $request->traitement_medicamenteux,
-                    "imc" => $request->imc,
-                    "drepanocytaire" => $request->drepanocytaire,
-                    "saturation_oxygene" => $request->saturation_oxygene,
-                    "type_visite" => $request->type_visite,
-                    "examen_physique" => $request->examen_physique,
-                    "diagnostic_retenu" => $request->diagnostic_retenu,
-                    "autre_pathologie_associee" => $request->autre_pathologie_associee,
-                    "autre_antecedent_medical" => $request->autre_antecedent_medical,
-                    "autre_antecedent_chirurgical" => $request->autre_antecedent_chirurgical,
-                    "nom_operation" => $request->nom_operation,
-                   
-                ]);
+                //"type_population" => $request->type_population,
+                "motif_consultation" => $request->motif_consultation,
+                "en_cours_de_scolarisation" => $request->en_cours_de_scolarisation,
+                "tdr_paludisme" => $request->tdr_paludisme,
+                "goutte_epaise" => $request->goutte_epaise,
+                "milda_enfant_eligible" => $request->milda_enfant_eligible,
+                "remise_milda_enfant" => $request->remise_milda_enfant,
+                "cdip_propose" => $request->cdip_propose,
+                "cdip_realise" => $request->cdip_realise,
+                "code_depistage_client" => $request->code_depistage_client,
+                "glycemie_a_jeun" => $request->glycemie_a_jeun,
+                "glycemie_non_a_jeun" => $request->glycemie_non_a_jeun,
+                "zcore" => $request->zscore,
+                "temperature" => $request->temperature,
+                "frequence_respiratoire" => $request->frequence_respiratoire,
+                "ta" => $request->ta,
+                "hta" => $request->hta,
+                "pouls" => $request->pouls,
+                "perimetre_brachial" => $request->perimetre_brachial,
+                "perimetre_cranien" => $request->perimetre_cranien,
+                "tuberculose" => $request->tuberculose,
+                "traitement_medicamenteux" => $request->traitement_medicamenteux,
+                "antecedent_medical" => $request->antecedent_medical,
+                "antecedent_chirurgical" => $request->antecedent_chirurgical,
+                "gyneco_obstetrico" => $request->gyneco_obstetrico,
+                "ddr" => $request->ddr,
+                "en_cours_de_grossesse" => $request->en_cours_de_grossesse,
+                "description_grossesse" => $request->description_grossesse,
+                "mode_de_vie" => $request->mode_de_vie,
+                "tabac" => $request->tabac,
+                "alcool" => $request->alcool,
+                "taille" => $request->taille,
+                "poids" => $request->poids,
+                "traitement_medicamenteux" => $request->traitement_medicamenteux,
+                "imc" => $request->imc,
+                "drepanocytaire" => $request->drepanocytaire,
+                "saturation_oxygene" => $request->saturation_oxygene,
+                "type_visite" => $request->type_visite,
+                "examen_physique" => $request->examen_physique,
+                "diagnostic_retenu" => $request->diagnostic_retenu,
+                "autre_pathologie_associee" => $request->autre_pathologie_associee,
+                "autre_antecedent_medical" => $request->autre_antecedent_medical,
+                "autre_antecedent_chirurgical" => $request->autre_antecedent_chirurgical,
+                "nom_operation" => $request->nom_operation,
+
+            ]);
 
             if ($consultationcurative) {
 
@@ -283,5 +283,14 @@ class ConsultationController extends Controller
     {
         $consultation = Consultation::findOrFail($id);
         return view('users.doctor.consultation.info', compact('consultation'));
+    }
+
+    public function patientCard(Request $request, $id)
+    {
+        $patient = \App\Models\Patient::with(['user', 'hospital'])->findOrFail($id);
+        if ($request->ajax()) {
+            return view('users.secretariat.patient.card_inner', compact('patient'));
+        }
+        return view('users.secretariat.patient.card', compact('patient'));
     }
 }

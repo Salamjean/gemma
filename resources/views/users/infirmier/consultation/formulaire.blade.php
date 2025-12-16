@@ -160,9 +160,11 @@
                         </div>
                         <div class="box-footer bt-3 border-primary">
                             <div class="float-end">
-                                <button type="button" class="btn btn-warning me-1">
-                                    <i class="ti-trash"></i> Annuler
-                                </button>
+                                <a href="{{ route('dashboard') }}">
+                                    <button type="button" class="btn btn-warning me-1">
+                                        <i class="ti-trash"></i> Annuler
+                                    </button>
+                                </a>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="ti-save-alt"></i> Valider
                                 </button>

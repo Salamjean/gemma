@@ -174,8 +174,8 @@ class SecretariatController extends Controller
                 $date = Carbon::now()->startOfWeek()->addDays($day);
                 $events[] = [
                     'id'    => $availability->id,
-                    'name'  => $availability->user->name . ' ' . $availability->user->prenom,
-                    'description' => $availability->user->role_as,
+                    'name'  => $availability->user->name ?? 'nom',
+                    'description' => $availability->user->role_as ?? '',
                     'date'  => $date->format('Y-m-d'),
                     'start' => $date->format('Y-m-d') . ' ' . $start_times[$index],
                     'badge'=>  $start_times[$index],

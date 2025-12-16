@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
                 //Route::get('detail/{id}', 'ConsultationController@detailconsulation')->name('detailConsul');
                 Route::get('detail/{id}', 'ConsultationController@detail')->name('detail');
                 Route::get('info/{id}', 'ConsultationController@infoPatient')->name('info');
+                Route::get('patient/{id}/card', 'ConsultationController@patientCard')->name('patient.card');
                 //formulaire consultation
                 Route::get('formulaire/{id}', 'ConsultationController@formulaire')->name('formulaire');
 

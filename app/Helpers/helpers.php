@@ -63,7 +63,7 @@ function noDossierHospitalisation()
     $date = date('Y');
     $count = Hospitalisation::whereDate('created_at', Carbon::now())->count();
     $count = $count + 1;
-    $dossier = "HOSP" . $date  . $count;
+    $dossier = "HOSP" . $date . $count;
 
     return $dossier;
 }
@@ -262,7 +262,7 @@ function codeTraitement($code, $id)
     $consultation = Consultation::where('patient_id', $id)->get();
     $count = $consultation->count() + 1;
 
-    $code = "TRAIT" .  substr($code, 2) . Auth::user()->doctor->hospital_id . $count;
+    $code = "TRAIT" . substr($code, 2) . Auth::user()->doctor->hospital_id . $count;
 
     return $code;
 }
@@ -273,7 +273,7 @@ function codeHospitalisation($code, $id)
     $consultation = Consultation::where('patient_id', $id)->get();
     $count = $consultation->count() + 1;
 
-    $code = "HOSP" .  substr($code, 2) . Auth::user()->doctor->hospital_id . $count;
+    $code = "HOSP" . substr($code, 2) . Auth::user()->doctor->hospital_id . $count;
 
     return $code;
 }
@@ -283,12 +283,13 @@ function codeObservation($code, $id)
     $consultation = Consultation::where('patient_id', $id)->get();
     $count = $consultation->count() + 1;
 
-    $code = "OBS" .  substr($code, 2) . Auth::user()->doctor->hospital_id . $count;
+    $code = "OBS" . substr($code, 2) . Auth::user()->doctor->hospital_id . $count;
 
     return $code;
 }
 
-function listePosologies(){
+function listePosologies()
+{
     return [
         '0-0-1',
         '1-0-0',
@@ -311,7 +312,7 @@ function listePosologies(){
     ];
 }
 
-function grudSaleType($type) : string
+function grudSaleType($type): string
 {
     $formatage = '';
     switch ($type) {
@@ -541,10 +542,21 @@ function uploadImage($image, $path)
 function deleteUploadImage($image, $link)
 {
     $uploadDirectory = 'public/assets/uploads/' . $link . '/';
-    $path = $uploadDirectory . $image;
 
-    if (file_exists($path)) {
-        unlink($path); // Supprime le fichier s'il existe
+    // Créer le dossier s'il n'existe pas
+    if (!file_exists($uploadDirectory)) {
+        mkdir($uploadDirectory, 0755, true);
+    }
+
+    // Supprimer l'ancienne image si elle existe
+    $oldImagePath = $uploadDirectory . $image;
+    if (file_exists($oldImagePath)) {
+        unlink($oldImagePath);
+    }
+
+    // Utiliser l'objet UploadedFile de Laravel
+    if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+        return false;
     }
 
     $file = $_FILES['image'];
@@ -556,7 +568,7 @@ function deleteUploadImage($image, $link)
     if (move_uploaded_file($file['tmp_name'], $destination)) {
         return $filename;
     } else {
-        return false; // La sauvegarde du fichier a échoué
+        return false;
     }
 }
 
@@ -614,7 +626,7 @@ function motSortie($name)
 
         default:
             $title = '';
-            return  $title;
+            return $title;
     }
 
     return $title;

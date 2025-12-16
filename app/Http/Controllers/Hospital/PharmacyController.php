@@ -74,6 +74,7 @@ class PharmacyController extends Controller
         //save availability
         $planning = new Availability();
         $planning->user_id = $user->id;
+        $planning->hour_start = json_encode($request->time);
         $planning->days = json_encode($request->day);
         $planning->save();
 

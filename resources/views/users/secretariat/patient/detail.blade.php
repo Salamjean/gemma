@@ -1,319 +1,321 @@
-
-@extends('layouts.dashboard',['title' => "Detail du Patient $patient->code_patient" ])
+@extends('layouts.dashboard', ['title' => "Detail du Patient $patient->code_patient"])
 
 @section('content')
-<div class="">
-	<div class="container-full">
-		
-		<section class="content">
+	<div class="">
+		<div class="container-full">
 
-			<div class="row">
-				<div class="col-12 col-md-12">
-					<a href="{{ back()->getTargetUrl() }}" class="btn btn-primary float-end mb-10"><span class="glyphicon glyphicon-chevron-left"></span>Retour en arrière</a>
-					<div class="box box-widget widget-user" style="position: relative;">
-						<div class="widget-user-header bg-img bbsr-0 bber-0" style="" data-overlay="5">
-							<h3 class="widget-user-username text-white">
-								{{ $patient->user->name }} {{ $patient->user->prenom }}
-								{{-- @if ($patient->deces->decesPatient->person)
+			<section class="content">
+
+				<div class="row">
+					<div class="col-12 col-md-12">
+						<a href="{{ back()->getTargetUrl() }}" class="btn btn-primary float-end mb-10"><span
+								class="glyphicon glyphicon-chevron-left"></span>Retour en arrière</a>
+						<div class="box box-widget widget-user" style="position: relative;">
+							<div class="widget-user-header bg-img bbsr-0 bber-0" style="" data-overlay="5">
+								<h3 class="widget-user-username text-white">
+									{{ $patient->user->name }} {{ $patient->user->prenom }}
+									{{-- @if ($patient->deces->decesPatient->person)
 									(Patient décédés)
-								@endif --}}
-							</h3>
-							<h6 class="widget-user-desc text-white"></h6>
-						</div>
-						<div class="" style="position: absolute; border-radius:100%; background-color:white; top:13%; left:2%;">
-						    @if ($patient->img_url != null)
-								<img src="{{ asset('assets/uploads/patient/'. $patient->img_url) }}"
-									class="rounded-circle" alt="Photo de profil" style="width:128px; height:128px" />
-							@else
-							    @if ($patient->gender == 'masculin')
-								<img src="{{ asset('assets/images/avatar/6.png') }}" class="rounded-circle"
-									alt="Photo de profil" />
-    							@else
-    								<img src="{{ asset('assets/images/avatar/2.png') }}" class="rounded-circle"
-    									alt="Photo de profil" />
-    							@endif
-							@endif
-						</div>
-						<div class="box-footer" style="padding-top: 100px;">
-							<div class="row">
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Code du dossier médical : </div>
-										<h5 class="declaration-header-description">
-											{{ $patient->code_patient }}
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Date de création du compte :</div>
-										<h5 class="declaration-header-description">
-											{{ $patient->created_at->format('d/m/Y - H:i:s') }}
-											@if ($patient->mere_id)
-												<a href="{{ route('hospital.patient.detail', $patient->mere_id) }}"> (
-													Enfant du patient {{ $patient->mere->user->name }}
-													{{ $patient->mere->user->prenom }} ) </a>
-											@endif
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Nom du patient :</div>
-										<h5 class="declaration-header-description">
-											{{ $patient->user->name }}
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Prénom du patient :</div>
-										<h5 class="declaration-header-description">
-											{{ $patient->user->prenom }}
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Genre:</div>
-										<h5 class="declaration-header-description">
-
-											{{ $patient->gender }}
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Profession:</div>
-										<h5 class="declaration-header-description">
-
-											{{ $patient->profession }}
-										</h5>
-									</div>
-								</div>
-
-
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Date de naissance :</div>
-										<h5 class="declaration-header-description">
-
-											{{ $patient->birth_date }}
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="declaration-header-title">Age :</div>
-									<div class="decalration-header">
-										<h5 class="declaration-header-description">
-											{{ \Carbon\Carbon::createFromFormat('d/m/Y', $patient->birth_date)->diffInYears(\Carbon\Carbon::now()) }}
-											ans
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Lieu de naissance :</div>
-										<h5 class="declaration-header-description">
-
-											{{ $patient->lieuNaissance->name }}
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Pays de naissance :</div>
-										<h5 class="declaration-header-description">
-
-											{{ $patient->country }}
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title"></div>
-										<h5 class="declaration-header-description">
-											<div class="declaration-header-title">Residence habituelle :</div>
-											<h5 class="declaration-header-description">
-												{{ $patient->residenceHabituelle->name }}
-											</h5>
-
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Residence actuelle :</div>
-										<h5 class="declaration-header-description">
-
-											{{ $patient->residenceActuelle->name }}
-										</h5>
-									</div>
-								</div>
-
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Assurer :</div>
-										<h5 class="declaration-header-description">
-											{{ $patient->assurer ? 'Oui' : 'Non' }}
-										</h5>
-									</div>
-								</div>
-								@if ($patient->assurer)
+									@endif --}}
+								</h3>
+								<h6 class="widget-user-desc text-white"></h6>
+							</div>
+							<div class=""
+								style="position: absolute; border-radius:100%; background-color:white; top:13%; left:2%;">
+								@if ($patient->img_url != null)
+									<img src="{{ asset('public/assets/uploads/patient/' . $patient->img_url) }}"
+										class="rounded-circle" alt="Photo de profil" style="width:128px; height:128px" />
+								@else
+									@if ($patient->gender == 'masculin')
+										<img src="{{ asset('assets/images/avatar/6.png') }}" class="rounded-circle"
+											alt="Photo de profil" />
+									@else
+										<img src="{{ asset('assets/images/avatar/2.png') }}" class="rounded-circle"
+											alt="Photo de profil" />
+									@endif
+								@endif
+							</div>
+							<div class="box-footer" style="padding-top: 100px;">
+								<div class="row">
 									<div class="col-sm-6 col-md-3">
 										<div class="decalration-header">
-											<div class="declaration-header-title">Numéro d'assurance :</div>
+											<div class="declaration-header-title">Code du dossier médical : </div>
 											<h5 class="declaration-header-description">
-												{{ $patient->no_assurance }}
+												{{ $patient->code_patient }}
 											</h5>
 										</div>
 									</div>
-								@endif
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Type de pièce :</div>
-										<h5 class="declaration-header-description">
-											{{ $patient->type_piece }}
-										</h5>
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Date de création du compte :</div>
+											<h5 class="declaration-header-description">
+												{{ $patient->created_at->format('d/m/Y - H:i:s') }}
+												@if ($patient->mere_id)
+													<a href="{{ route('hospital.patient.detail', $patient->mere_id) }}"> (
+														Enfant du patient {{ $patient->mere->user->name }}
+														{{ $patient->mere->user->prenom }} ) </a>
+												@endif
+											</h5>
+										</div>
 									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Numéro de pièce :</div>
-										<h5 class="declaration-header-description">
-											{{ $patient->numero_identite }}
-										</h5>
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Nom du patient :</div>
+											<h5 class="declaration-header-description">
+												{{ $patient->user->name }}
+											</h5>
+										</div>
 									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Contact :</div>
-										<h5 class="declaration-header-description">
-											{{ $patient->telephone }}
-										</h5>
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Prénom du patient :</div>
+											<h5 class="declaration-header-description">
+												{{ $patient->user->prenom }}
+											</h5>
+										</div>
 									</div>
-								</div>
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Genre:</div>
+											<h5 class="declaration-header-description">
 
-								@if ($patient->contact2)
+												{{ $patient->gender }}
+											</h5>
+										</div>
+									</div>
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Profession:</div>
+											<h5 class="declaration-header-description">
+
+												{{ $patient->profession }}
+											</h5>
+										</div>
+									</div>
+
+
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Date de naissance :</div>
+											<h5 class="declaration-header-description">
+
+												{{ $patient->birth_date }}
+											</h5>
+										</div>
+									</div>
+									<div class="col-sm-6 col-md-3">
+										<div class="declaration-header-title">Age :</div>
+										<div class="decalration-header">
+											<h5 class="declaration-header-description">
+												{{ \Carbon\Carbon::createFromFormat('d/m/Y', $patient->birth_date)->diffInYears(\Carbon\Carbon::now()) }}
+												ans
+											</h5>
+										</div>
+									</div>
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Lieu de naissance :</div>
+											<h5 class="declaration-header-description">
+
+												{{ $patient->lieuNaissance->name }}
+											</h5>
+										</div>
+									</div>
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Pays de naissance :</div>
+											<h5 class="declaration-header-description">
+
+												{{ $patient->country }}
+											</h5>
+										</div>
+									</div>
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title"></div>
+											<h5 class="declaration-header-description">
+												<div class="declaration-header-title">Residence habituelle :</div>
+												<h5 class="declaration-header-description">
+													{{ $patient->residenceHabituelle->name }}
+												</h5>
+
+											</h5>
+										</div>
+									</div>
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Residence actuelle :</div>
+											<h5 class="declaration-header-description">
+
+												{{ $patient->residenceActuelle->name }}
+											</h5>
+										</div>
+									</div>
+
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Assurer :</div>
+											<h5 class="declaration-header-description">
+												{{ $patient->assurer ? 'Oui' : 'Non' }}
+											</h5>
+										</div>
+									</div>
+									@if ($patient->assurer)
+										<div class="col-sm-6 col-md-3">
+											<div class="decalration-header">
+												<div class="declaration-header-title">Numéro d'assurance :</div>
+												<h5 class="declaration-header-description">
+													{{ $patient->no_assurance }}
+												</h5>
+											</div>
+										</div>
+									@endif
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Type de pièce :</div>
+											<h5 class="declaration-header-description">
+												{{ $patient->type_piece }}
+											</h5>
+										</div>
+									</div>
+									<div class="col-sm-6 col-md-3">
+										<div class="decalration-header">
+											<div class="declaration-header-title">Numéro de pièce :</div>
+											<h5 class="declaration-header-description">
+												{{ $patient->numero_identite }}
+											</h5>
+										</div>
+									</div>
 									<div class="col-sm-6 col-md-3">
 										<div class="decalration-header">
 											<div class="declaration-header-title">Contact :</div>
 											<h5 class="declaration-header-description">
-												{{ $patient->contact2 }}
+												{{ $patient->telephone }}
 											</h5>
 										</div>
 									</div>
-								@endif
-								<div class="col-sm-6 col-md-5">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Personne à contacter en cas d'urgence :
-										</div>
-										<h5 class="declaration-header-description">
-											{{ $patient->nom_personne_cas_urgence }}
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-4">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Numéro personne à contacter en cas
-											d'urgence :</div>
-										<h5 class="declaration-header-description">
-											{{ $patient->telephone_personne_cas_urgence }}
-										</h5>
-									</div>
-								</div>
-								<div class="col-sm-6 col-md-3">
-									<div class="decalration-header">
-										<div class="declaration-header-title">Lien de la personne :</div>
-										<h5 class="declaration-header-description">
-											{{ $patient->lien_personne_cas_urgence }}
-										</h5>
-									</div>
-								</div>
 
-								@if ($patient->nom_personne2_cas_urgence)
+									@if ($patient->contact2)
+										<div class="col-sm-6 col-md-3">
+											<div class="decalration-header">
+												<div class="declaration-header-title">Contact :</div>
+												<h5 class="declaration-header-description">
+													{{ $patient->contact2 }}
+												</h5>
+											</div>
+										</div>
+									@endif
 									<div class="col-sm-6 col-md-5">
 										<div class="decalration-header">
-											<div class="declaration-header-title">Personne à contacter en cas d'urgence
-												n°2
-												:
+											<div class="declaration-header-title">Personne à contacter en cas d'urgence :
 											</div>
 											<h5 class="declaration-header-description">
-												{{ $patient->nom_personne2_cas_urgence }}
+												{{ $patient->nom_personne_cas_urgence }}
 											</h5>
 										</div>
 									</div>
 									<div class="col-sm-6 col-md-4">
 										<div class="decalration-header">
 											<div class="declaration-header-title">Numéro personne à contacter en cas
-												n°2
 												d'urgence :</div>
 											<h5 class="declaration-header-description">
-												{{ $patient->telephone_personne2_cas_urgence }}
+												{{ $patient->telephone_personne_cas_urgence }}
 											</h5>
 										</div>
 									</div>
 									<div class="col-sm-6 col-md-3">
 										<div class="decalration-header">
-											<div class="declaration-header-title">Lien de la personne n°2 :</div>
+											<div class="declaration-header-title">Lien de la personne :</div>
 											<h5 class="declaration-header-description">
-												{{ $patient->lien_personne2_cas_urgence }}
+												{{ $patient->lien_personne_cas_urgence }}
 											</h5>
 										</div>
 									</div>
-								@endif
-								@if ($patient->gender == 'feminin')
-									<div class="col-sm-12 col-md-12">
-										<div class="decalration-header">
-											<div class="declaration-header-title">Enfants :</div>
-											@if($patient->enfantsPatient->count() > 0)
-												<h5 class="declaration-header-description">
-													@foreach ($patient->enfantsPatient as $item)
-														<span style="margin-right: 10px;">
-															<a href="{{ route('secretariat.patient.detail', $item->naissance->enfant->id) }}">
-																{{ $item->naissance->enfant->code_patient }},
-															</a>
-														</span>
-													@endforeach
-												</h5>
-											@else
-											<span class="badge badge-primary">Pas d'enfant</span>
-											@endif
-										</div>
-									</div>
-								@endif
 
+									@if ($patient->nom_personne2_cas_urgence)
+										<div class="col-sm-6 col-md-5">
+											<div class="decalration-header">
+												<div class="declaration-header-title">Personne à contacter en cas d'urgence
+													n°2
+													:
+												</div>
+												<h5 class="declaration-header-description">
+													{{ $patient->nom_personne2_cas_urgence }}
+												</h5>
+											</div>
+										</div>
+										<div class="col-sm-6 col-md-4">
+											<div class="decalration-header">
+												<div class="declaration-header-title">Numéro personne à contacter en cas
+													n°2
+													d'urgence :</div>
+												<h5 class="declaration-header-description">
+													{{ $patient->telephone_personne2_cas_urgence }}
+												</h5>
+											</div>
+										</div>
+										<div class="col-sm-6 col-md-3">
+											<div class="decalration-header">
+												<div class="declaration-header-title">Lien de la personne n°2 :</div>
+												<h5 class="declaration-header-description">
+													{{ $patient->lien_personne2_cas_urgence }}
+												</h5>
+											</div>
+										</div>
+									@endif
+									@if ($patient->gender == 'feminin')
+										<div class="col-sm-12 col-md-12">
+											<div class="decalration-header">
+												<div class="declaration-header-title">Enfants :</div>
+												@if($patient->enfantsPatient->count() > 0)
+													<h5 class="declaration-header-description">
+														@foreach ($patient->enfantsPatient as $item)
+															<span style="margin-right: 10px;">
+																<a
+																	href="{{ route('secretariat.patient.detail', $item->naissance->enfant->id) }}">
+																	{{ $item->naissance->enfant->code_patient }},
+																</a>
+															</span>
+														@endforeach
+													</h5>
+												@else
+													<span class="badge badge-primary">Pas d'enfant</span>
+												@endif
+											</div>
+										</div>
+									@endif
+
+								</div>
 							</div>
 						</div>
+
 					</div>
 
 				</div>
 
-			</div>
-
-		</section>
+			</section>
+		</div>
 	</div>
-</div>
-<style>
-	.decalration-header {
-		margin-bottom: 10px;
-	}
+	<style>
+		.decalration-header {
+			margin-bottom: 10px;
+		}
 
-	.declaration-header-title {
-		font-weight: bold;
-		font-size: 17px;
-	}
+		.declaration-header-title {
+			font-weight: bold;
+			font-size: 17px;
+		}
 
-	.declaration-header-description {
-		font-size: 16px;
-		font-style: italic;
-	}
+		.declaration-header-description {
+			font-size: 16px;
+			font-style: italic;
+		}
 
-	.declaration-header-description-12 {
-		padding: 10px;
-		border-radius: 10px;
-		border: 1px solid #ccc;
-		font-style: italic;
-	}
-</style>
+		.declaration-header-description-12 {
+			padding: 10px;
+			border-radius: 10px;
+			border: 1px solid #ccc;
+			font-style: italic;
+		}
+	</style>
 @endsection

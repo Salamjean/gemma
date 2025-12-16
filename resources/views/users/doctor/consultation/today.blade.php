@@ -30,9 +30,9 @@
                                     {{ $item->patient->user->name }}&nbsp; {{ $item->patient->user->prenom }}
                                 </td>
                                 <td class="" style="width: 200px;">
-								{{ $item->prestationHospital->prestationService->libelle }}
+                                    {{ $item->prestationHospital->prestationService->libelle }}
 
-                                    </td>
+                                </td>
 
                                 <td class="">
                                     @if ($item->status == 0)
@@ -47,17 +47,21 @@
 
                                     @if ($item->status == 0)
                                         <a href="{{ route('doctor.consultation.formulaire', $item->id) }}"
-                                            class="btn btn-sm btn-info" id="menu"title="Menu">
+                                            class="btn btn-sm btn-info" id="menu" title="Menu">
                                             <span class="">Commencer la consultation</span>
 
                                         </a>
 
                                     @else
-                                        <a href="{{ route('doctor.consultation.detail', $item->id) }}"
-                                            class="btn btn-sm btn-info" title="detail consultation">
+                                        <a href="{{ route('doctor.consultation.detail', $item->id) }}" class="btn btn-sm btn-info"
+                                            title="detail consultation">
                                             <span class="">Détail</span>
                                         </a>
                                     @endif
+                                    <a href="javascript:void(0)"
+                                        onclick="openCardModal('{{ route('doctor.consultation.patient.card', $item->patient->id) }}')"
+                                        class="btn btn-sm btn-warning" title="Carte numérique"><i
+                                            class="fa-solid fa-id-card"></i></a>
                                 </td>
                             </tr>
                         @endforeach
@@ -67,10 +71,10 @@
         </div>
     </div>
     <script>
-        (function($) {
+        (function ($) {
             "use strict";
 
-            $('#menu').on('click', function(e) {
+            $('#menu').on('click', function (e) {
 
 
 
@@ -83,3 +87,51 @@
         })(jQuery);
     </script>
 @endsection
+
+@push('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function openCardModal(url) {
+            Swal.fire({
+                html: '<div id="swal-card-container" style="min-height: 600px; overflow: hidden;"></div>',
+                width: '1500px',
+                maxWidth: '95vw',
+                padding: '2em',
+                background: 'transparent',
+                showConfirmButton: false,
+                showCloseButton: true,
+                didOpen: () => {
+                    Swal.getPopup().style.overflow = 'hidden';
+                    Swal.showLoading();
+                    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                        .then(response => {
+                            if (!response.ok) throw new Error("Network response was not ok");
+                            return response.text();
+                        })
+                        .then(html => {
+                            Swal.hideLoading();
+                            const container = document.getElementById('swal-card-container');
+                            container.innerHTML = html;
+
+                            const scripts = container.querySelectorAll("script");
+                            scripts.forEach(oldScript => {
+                                const newScript = document.createElement("script");
+                                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                                oldScript.parentNode.replaceChild(newScript, oldScript);
+                            });
+                        })
+                        .catch(err => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erreur',
+                                text: 'Impossible de charger la carte.',
+                                confirmButtonColor: '#3596f7'
+                            });
+                            console.error(err);
+                        });
+                }
+            });
+        }
+    </script>
+@endpush

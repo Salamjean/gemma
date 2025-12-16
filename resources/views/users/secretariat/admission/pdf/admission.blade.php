@@ -48,7 +48,6 @@
                 <div>
                     <ul>
                         <li><b>Type d'admission:  </b>&nbsp;&nbsp;&nbsp;{{ $admission->type_admission }}</li>
-                        <li><b>Motif de la visite : </b>&nbsp;&nbsp;&nbsp;{{ $admission->prestationHospital->serviceHopital->service->libelle }}</li>
                         <li><b>Mode d'entrée:  </b> &nbsp;&nbsp;&nbsp;{{ $admission->mode_entree }}</li>
                         <li><b>Motif de la consultation :   </b>&nbsp;&nbsp;&nbsp; {{ $admission->motif_consultation }}</li>
                     </ul>

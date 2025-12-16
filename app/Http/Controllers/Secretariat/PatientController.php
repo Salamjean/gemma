@@ -32,8 +32,8 @@ class PatientController extends Controller
 
         $hospital = Auth::user()->secretariat->hospital_id;
         $patients = Patient::whereHas('passage', function ($query) use ($hospital) {
-                $query->where('hospital_id', $hospital);
-            })
+            $query->where('hospital_id', $hospital);
+        })
             ->where('status', 1)
             ->with('user')
             ->with('lieuNaissance')
@@ -136,13 +136,21 @@ class PatientController extends Controller
         }
         // Retourner une réponse JSON
         return response()->json(['success' => 'Patient mis à jour avec succès']);
-
     }
     public function detail($id)
     {
         $patient = Patient::find($id);
         $type_assurances = TypeAssurance::get();
         return view('users.secretariat.patient.detail', compact('patient', 'type_assurances'));
+    }
+
+    public function card(Request $request, $id)
+    {
+        $patient = Patient::with(['user', 'hospital'])->findOrFail($id);
+        if ($request->ajax()) {
+            return view('users.secretariat.patient.card_inner', compact('patient'));
+        }
+        return view('users.secretariat.patient.card', compact('patient'));
     }
 
     public function searchPatients(Request $request)
@@ -198,6 +206,11 @@ class PatientController extends Controller
             'infirmier_id' => 'required_if:admission_patient,Oui',
             'motif_consultation' => 'required_if:admission_patient,Oui',
             'img_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'fingerprint_left_template' => 'nullable|string',
+            'fingerprint_right_template' => 'nullable|string',
+            'fingerprint_left_image' => 'nullable|string',
+            'fingerprint_right_image' => 'nullable|string',
+            'fingerprint_device' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -256,6 +269,13 @@ class PatientController extends Controller
             'telephone_personne2_cas_urgence' => $request->telephone_personne2_cas_urgence,
             'lien_personne2_cas_urgence' => $request->lien_personne2_cas_urgence,
             'status' => 1,
+            'fingerprint_left_index' => $request->fingerprint_left_template,
+            'fingerprint_right_index' => $request->fingerprint_right_template,
+            'fingerprint_left_image' => $request->fingerprint_left_image,
+            'fingerprint_right_image' => $request->fingerprint_right_image,
+            'fingerprint_device' => $request->fingerprint_device ?? config('fingerprint.device'),
+            'fingerprint_captured_at' => $request->fingerprint_left_template && $request->fingerprint_right_template ? now() : null,
+            'fingerprint_verified' => (bool) ($request->fingerprint_left_template && $request->fingerprint_right_template),
         ]);
 
         if ($request->admission_patient == 'Oui') {
@@ -310,7 +330,6 @@ class PatientController extends Controller
                     // Optionnel: ajouter un message pour l'administrateur
                 }
             }
-
         }
         return response()->json(['success' => 'Patient enregistré avec succès'], 200);
     }

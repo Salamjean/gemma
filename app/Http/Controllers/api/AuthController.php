@@ -91,9 +91,30 @@ class AuthController extends Controller
                 'user_id' => $user->id,
                 'error' => $e->getMessage()
             ]);
-            return response([
-                'message' => 'Erreur lors de l\'envoi de l\'OTP. Veuillez réessayer.'
-            ], 500);
+            // On ne retourne pas d'erreur ici pour laisser une chance au SMS
+        }
+
+        // Envoyer l'OTP par SMS
+        if ($patient->telephone) {
+            try {
+                $message = "Votre code de connexion GEMMA est : " . $otpCode;
+                // Instancier le SmsRepository avec le numéro et le message
+                // Attention : SmsRepository ajoute déjà +225, assurez-vous que $patient->telephone est au bon format (sans indicatif ou adapté)
+                $sms = new SmsRepository($patient->telephone, $message);
+                $sms->send();
+
+                Log::info('OTP envoyé par SMS', [
+                    'patient_id' => $patient->id,
+                    'telephone' => $patient->telephone
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Erreur lors de l\'envoi de l\'OTP par SMS', [
+                    'patient_id' => $patient->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        } else {
+            Log::warning('Pas de numéro de téléphone pour envoyer le SMS', ['patient_id' => $patient->id]);
         }
 
         return response([
@@ -297,9 +318,11 @@ class AuthController extends Controller
         // Récupérer les données complètes du patient
         try {
             $patientData = Patient::where('id', $patient->id)
-                ->with(['user' => function ($query) {
-                    $query->select('id', 'name', 'prenom', 'email');
-                }])
+                ->with([
+                    'user' => function ($query) {
+                        $query->select('id', 'name', 'prenom', 'email');
+                    }
+                ])
                 ->first();
         } catch (\Exception $e) {
             Log::error('Erreur récupération données patient:', [

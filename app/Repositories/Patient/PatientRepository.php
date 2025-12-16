@@ -25,7 +25,7 @@ class PatientRepository
         $request->validated();
 
         $patient = Patient::find(Auth::user()->patient->id);
-        if(!$patient)
+        if (!$patient)
             return ['status' => 'error', 'message' => 'Utilisateur introuvable.'];
 
         //user
@@ -67,28 +67,29 @@ class PatientRepository
 
     public function consultations()
     {
-        return Consultation::orderByDESC('created_at')->where('status', 1)->where('patient_id', Auth::user()->patient->id)
-            ->with('admission','doctor.user','hospital.user','ordonnance.prescriptions', 'examen.examens', 'arret', 'registre', 'declaration.deces', 'declaration.naissance', 'declaration.decesPatient')
+        return Consultation::orderByDESC('created_at')->where('patient_id', Auth::user()->patient->id)
+            ->with('admission', 'doctor.user', 'hospital.user', 'ordonnance.prescriptions', 'examen.examens', 'arret', 'registre', 'declaration.deces', 'declaration.naissance', 'declaration.decesPatient')
             ->with('hospitalisation.daysHospitalisation.therapeutiqueProtocols')
             ->get();
     }
 
     public function declarations()
     {
-        return Declaration::orderByDESC('created_at')->where('patient_id', Auth::user()->patient->id)->with('doctor.user','hospital.user', 'deces', 'naissance', 'consultation.registre')->get();
+        return Declaration::orderByDESC('created_at')->where('patient_id', Auth::user()->patient->id)->with('doctor.user', 'hospital.user', 'deces', 'naissance', 'consultation.registre')->get();
     }
 
     public function rendezVous()
     {
         $patient = Auth::user()->patient->id;
-        return RendezVous::orderByDESC('created_at')->whereHas('consultation',
+        return RendezVous::orderByDESC('created_at')->whereHas(
+            'consultation',
             function (Builder $query) use ($patient) {
                 $query->where('patient_id', $patient);
             }
-        )->with('consultation', function ($query){
+        )->with('consultation', function ($query) {
             $query->with('doctor.user')->with('hospital')->get();
         })
-        ->get();
+            ->get();
     }
 
 }
