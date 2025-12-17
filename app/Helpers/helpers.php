@@ -541,7 +541,7 @@ function uploadImage($image, $path)
 
 function deleteUploadImage($image, $link)
 {
-    $uploadDirectory = 'public/assets/uploads/' . $link . '/';
+    $uploadDirectory = public_path('assets/uploads/' . $link . '/');
 
     // Créer le dossier s'il n'existe pas
     if (!file_exists($uploadDirectory)) {
