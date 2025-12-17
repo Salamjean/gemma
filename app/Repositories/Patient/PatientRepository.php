@@ -62,7 +62,14 @@ class PatientRepository
         }
         $patient->save();
 
-        return ['status' => 'success', 'message' => 'Vos données ont été modifié avec succès.'];
+        // Recharger le patient avec ses relations pour retourner les données complètes
+        $patient->load('user', 'habitualResidence', 'currentResidence', 'lieuNaissance', 'hospital');
+
+        return [
+            'status' => 'success',
+            'message' => 'Vos données ont été modifié avec succès.',
+            'patient' => $patient  // Retourner les données du patient mises à jour
+        ];
     }
 
     public function consultations()
