@@ -79,7 +79,7 @@
 
 <body>
     <div id="watermark">
-        <img class="img__content" src="{{ asset('assets/uploads/femme.jpg') }}" />
+        <img class="img__content" src="{{ public_path('assets/uploads/femme.jpg') }}" />
     </div>
     <footer>
         Art. 285. Quiconque se rend coupable de fraude ou de fausse déclaration ou se fait délivrer un des documents
@@ -88,80 +88,89 @@
         ans et d'une amende de 200.000 à 2.000.000 de francs Franc CFA selon Art 281 et 223
     </footer>
 
-        <div class="container">
-            <div class="header__section">
-                <div><img src="{{ asset('assets/uploads/ministere.jpg') }}" alt=""></div>
-                <h1>Certificat médical de naissance</h1>
-                <div style="position: absolute; top:0; right :0;"><img src="{{ asset('assets/uploads/republique.png') }}"
-                        alt=""></div>
-
-            </div>
-
-            <div class="section" style="margin-top: 30px;">
-                <div class="section-content-nob">
-                    <p>Formation Sanitaire : {{ $declaration->hospital->label }}</p>
-                    <p>Ville/Commune de Naissance : {{ $declaration->hospital->localiteH->name }}</p>
-                    <p>Date : {{ Carbon\Carbon::parse($declaration->created_at)->format('d-m-Y') }}</p>
-                    <p>Numéro de Déclaration : {{ $declaration->reference }}</p>
-                </div>
-            </div>
-
-            <div class="section" style="margin-top: 30px;">
-                <div class="section-content">
-                    <p class="content" style="margin-top: 20px;">Je soussigné(e)
-                        <span style="font-size: 18px; font-style:italic; color:rgb(9, 16, 24);">{{ $declaration->doctor->user->name }}
-                            {{ $declaration->doctor->user->prenom }}</span>, </p>
-                    <p class="content" style="margin-top: 20px;">certifie que Mme :
-                        <span style="font-size: 18px; font-style:italic; color:rgb(9, 16, 24);">{{ $declaration->patient->user->name }}
-                            {{ $declaration->patient->user->prenom }}</span>, numéro de dossier médical : {{ $declaration->patient->code_patient }}
-                        </p>
-                    <p class="content" style="margin-top: 20px;">
-                        a accouché dans notre établissement sanitaire le :
-                        <span style="font-size: 18px; font-style:italic; color:rgb(9, 16, 24);">{{ Carbon\Carbon::parse($declaration->date)->format('d-m-Y') }}</span>
-                        à <span style="font-size: 18px; font-style:italic; color:rgb(9, 16, 24);">{{ Carbon\Carbon::parse($declaration->heure)->format('H:i') }}</span>,
-                    </p>
-                    <p class="content" style="margin-top: 20px;">
-                        @if ($declaration->naissance->nombre == 1)
-                            De {{ $declaration->naissance->nombre }} enfant {{ $declaration->naissance->nee }}, de sexe {{ $declaration->naissance->genre }}.
-                        @else
-                            De {{ $declaration->naissance->nombre }} enfants qui sont du genre de sexe {{ $declaration->naissance->genre }}. Etat des enfants : {{ $declaration->naissance->nee }}.
-                        @endif
-                    </p>
-                    <br>
-                    <br>
-                    <br>
-                    <div>
-                        <p style="float: right;margin-right : 50px;">
-                            Fait à {{ $declaration->hospital->localite }} . Le {{ date('d-m-Y') }}.
-                        </p>
-                    </div>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <div>
-                        <p style="float: right;margin-right : 150px;">
-                            @if ($declaration->doctor->typeAgent->libelle == 'Médecin')
-                                Le Médecin :
-                            @elseif ($declaration->doctor->typeAgent->libelle == 'Sage femme')
-                                La sage femme :
-                            @elseif ($declaration->doctor->typeAgent->libelle == 'Infirmier')
-                                L'infirmier' :
-                            @endif
-
-                        </p>
-                        <br>
-                        <br>
-
-                        <div style="color: gray;float: right;margin-right : 150px;">
-                            {{ $declaration->doctor->user->name }}
-                            {{ $declaration->doctor->user->prenom }}</div>
-                    </div>
-                </div>
-            </div>
-
+    <div class="container">
+        <div class="header__section">
+            <div><img src="{{ public_path('assets/uploads/ministere.jpg') }}" alt=""></div>
+            <h1>Certificat médical de naissance</h1>
+            <div style="position: absolute; top:0; right :0;"><img
+                    src="{{ public_path('assets/uploads/republique.png') }}" alt=""></div>
 
         </div>
+
+        <div class="section" style="margin-top: 30px;">
+            <div class="section-content-nob">
+                <p>Formation Sanitaire : {{ $declaration->hospital->label }}</p>
+                <p>Ville/Commune de Naissance : {{ $declaration->hospital->localiteH->name }}</p>
+                <p>Date : {{ Carbon\Carbon::parse($declaration->created_at)->format('d-m-Y') }}</p>
+                <p>Numéro de Déclaration : {{ $declaration->reference }}</p>
+            </div>
+        </div>
+
+        <div class="section" style="margin-top: 30px;">
+            <div class="section-content">
+                <p class="content" style="margin-top: 20px;">Je soussigné(e)
+                    <span
+                        style="font-size: 18px; font-style:italic; color:rgb(9, 16, 24);">{{ $declaration->doctor->user->name }}
+                        {{ $declaration->doctor->user->prenom }}</span>,
+                </p>
+                <p class="content" style="margin-top: 20px;">certifie que Mme :
+                    <span
+                        style="font-size: 18px; font-style:italic; color:rgb(9, 16, 24);">{{ $declaration->patient->user->name }}
+                        {{ $declaration->patient->user->prenom }}</span>, numéro de dossier médical :
+                    {{ $declaration->patient->code_patient }}
+                </p>
+                <p class="content" style="margin-top: 20px;">
+                    a accouché dans notre établissement sanitaire le :
+                    <span
+                        style="font-size: 18px; font-style:italic; color:rgb(9, 16, 24);">{{ Carbon\Carbon::parse($declaration->date)->format('d-m-Y') }}</span>
+                    à <span
+                        style="font-size: 18px; font-style:italic; color:rgb(9, 16, 24);">{{ Carbon\Carbon::parse($declaration->heure)->format('H:i') }}</span>,
+                </p>
+                <p class="content" style="margin-top: 20px;">
+                    @if ($declaration->naissance->nombre == 1)
+                        De {{ $declaration->naissance->nombre }} enfant {{ $declaration->naissance->nee }}, de sexe
+                        {{ $declaration->naissance->genre }}.
+                    @else
+                        De {{ $declaration->naissance->nombre }} enfants qui sont du genre de sexe
+                        {{ $declaration->naissance->genre }}. Etat des enfants : {{ $declaration->naissance->nee }}.
+                    @endif
+                </p>
+                <br>
+                <br>
+                <br>
+                <div>
+                    <p style="float: right;margin-right : 50px;">
+                        Fait à {{ $declaration->hospital->localite }} . Le {{ date('d-m-Y') }}.
+                    </p>
+                </div>
+                <br>
+                <br>
+                <br>
+                <br>
+                <div>
+                    <p style="float: right;margin-right : 150px;">
+                        @if ($declaration->doctor->typeAgent->libelle == 'Médecin')
+                            Le Médecin :
+                        @elseif ($declaration->doctor->typeAgent->libelle == 'Sage femme')
+                            La sage femme :
+                        @elseif ($declaration->doctor->typeAgent->libelle == 'Infirmier')
+                            L'infirmier' :
+                        @endif
+
+                    </p>
+                    <br>
+                    <br>
+
+                    <div style="color: gray;float: right;margin-right : 150px;">
+                        {{ $declaration->doctor->user->name }}
+                        {{ $declaration->doctor->user->prenom }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
 
 
 

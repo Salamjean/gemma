@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('code');
             $table->string('type_consultation');//consultation prenatale, consultation postnatale, consultation curative, accouchement
             $table->integer('consultation_id');
-            $table->string('issue_consultation');
+            $table->string('issue_consultation')->nullable();
             $table->string('issue_consultation_justification')->nullable();
             $table->timestamps();
         });

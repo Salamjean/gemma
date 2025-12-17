@@ -79,7 +79,7 @@
 
 <body>
     <div id="watermark">
-        <img class="img__content" w src="{{ asset('assets/uploads/deces.jpg') }}" />
+        <img class="img__content" w src="{{ public_path('assets/uploads/deces.jpg') }}" />
     </div>
     <footer>
         Art. 285. Quiconque se rend coupable de fraude ou de fausse déclaration ou se fait délivrer un des documents
@@ -89,10 +89,10 @@
     </footer>
     <div class="container">
         <div class="header__section">
-            <div><img src="{{ asset('assets/uploads/ministere.jpg') }}" alt=""></div>
+            <div><img src="{{ public_path('assets/uploads/ministere.jpg') }}" alt=""></div>
             <h1>Certificat médical de décès</h1>
-            <div style="position: absolute; top:0; right :0;"><img src="{{ asset('assets/uploads/republique.png') }}"
-                    alt=""></div>
+            <div style="position: absolute; top:0; right :0;"><img
+                    src="{{ public_path('assets/uploads/republique.png') }}" alt=""></div>
 
         </div>
 
@@ -180,7 +180,8 @@
 
                     <div style="color: gray;float: right;margin-right : 150px;">
                         {{ $declaration->doctor->user->name }}
-                        {{ $declaration->doctor->user->prenom }}</div>
+                        {{ $declaration->doctor->user->prenom }}
+                    </div>
                 </div>
             </div>
         </div>

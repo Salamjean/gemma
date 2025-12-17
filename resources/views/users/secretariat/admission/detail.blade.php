@@ -14,7 +14,7 @@
                   <div class="box profile-header">
                       <div class="box-body text-center">
                           <div class="profile-image mb-10">
-                              @if ($admission->patient->img_url != null)
+                              @if ($admission->patient->img_url != null && file_exists(public_path('assets/uploads/patient/'. $admission->patient->img_url)))
     								<img src="{{ asset('assets/uploads/patient/'. $admission->patient->img_url) }}"
     									class="rounded-circle" alt="Photo de profil" style="width:128px; height:128px" />
     							@else
