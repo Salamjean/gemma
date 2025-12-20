@@ -49,8 +49,8 @@
                                             </label>
                                             <div class="input-group">
 
-                                                <input type="number" name="nbBed" id="nbBed" class="form-control"
-                                                    min="1" required>
+                                                <input type="number" name="nbBed" id="nbBed" class="form-control" min="1"
+                                                    required>
                                             </div>
                                         </div>
                                     </div>
@@ -60,8 +60,8 @@
                                                 </b><span class="danger">*</span>
                                             </label>
                                             <div class="input-group">
-                                                <input type="number" name="price" id="price" class="form-control"
-                                                    min="1" required>
+                                                <input type="number" name="price" id="price" class="form-control" min="1"
+                                                    required>
                                             </div>
                                         </div>
                                     </div>
@@ -122,10 +122,9 @@
                                         </div>
                                     </div>
 
-                                    <input type="hidden" name="bedNumber" id="bedNumber0" class="form-control"
-                                        min="0" value="1" required>
-                                    <input type="hidden" name="nbBed" id="nbBed" value="1"
-                                        class="form-control" min="1">
+                                    <input type="hidden" name="bedNumber" id="bedNumber0" class="form-control" min="0" value="1"
+                                        required>
+                                    <input type="hidden" name="nbBed" id="nbBed" value="1" class="form-control" min="1">
 
                                     <div class="col-md-3">
                                         <div class="form-group">
@@ -133,8 +132,8 @@
                                                 </b><span class="danger">*</span>
                                             </label>
                                             <div class="input-group">
-                                                <input type="number" name="price" id="price" class="form-control"
-                                                    min="1" required>
+                                                <input type="number" name="price" id="price" class="form-control" min="1"
+                                                    required>
                                             </div>
                                         </div>
                                     </div>
@@ -160,8 +159,8 @@
                                 </div>
                             </div>
                             <div class="box-footer text-end">
-                                <button type="reset" class="btn btn-warning me-1">
-                                    <i class="ti-trash"></i> Annuler
+                                <button type="button" class="btn btn-warning me-1" onclick="history.back()">
+                                    <i class="ti-arrow-left"></i> Annuler
                                 </button>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="ti-save-alt"></i> Enregister
@@ -176,11 +175,11 @@
             </div>
         </div>
         <script>
-            (function($) {
+            (function ($) {
                 "use strict";
 
 
-                $('#nbBed').on('input', function() {
+                $('#nbBed').on('input', function () {
                     const value = parseInt($(this).val());
 
                     if (value > 0) {
@@ -188,20 +187,20 @@
 
                         for (var i = 0; i < value; i++) {
                             $(".container__bed").append(`<div class="row" style="margin-bottom:30px;">
-                <div class="col-md-3"></div>
-                <div class="col-md-2">
-                    <div class="ribbon ribbon-dark" style="margin-bottom: 5px; margin-top: 10px; padding:6px; background-color:orange; width:100%;">Lit n°${i+1}</div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="genre" class="form-label">
-                            <b>Numéro du lit : <span class="danger">* </span> </b>
-                        </label>
-                        <input type="number" name="bedNumber${i}" id="bedNumber${i}" class="form-control" min="1" required>
+                    <div class="col-md-3"></div>
+                    <div class="col-md-2">
+                        <div class="ribbon ribbon-dark" style="margin-bottom: 5px; margin-top: 10px; padding:6px; background-color:orange; width:100%;">Lit n°${i + 1}</div>
                     </div>
-                </div>
-                <div class="col-md-3"></div>
-            </div>`);
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="genre" class="form-label">
+                                <b>Numéro du lit : <span class="danger">* </span> </b>
+                            </label>
+                            <input type="number" name="bedNumber${i}" id="bedNumber${i}" class="form-control" min="1" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>`);
                         }
                     } else {
                         $(".container__bed").empty();
@@ -211,4 +210,4 @@
 
             })(jQuery);
         </script>
-    @endsection
+@endsection
