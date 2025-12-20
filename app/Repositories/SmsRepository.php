@@ -19,7 +19,7 @@ class SmsRepository
 
         // Récupération des identifiants Yéllika depuis le .env
         $this->apiKey = env('YELLIKA_API_KEY');
-        $this->senderId = env('YELLIKA_SENDER_ID', 'GEMMA');
+        $this->senderId = env('YELLIKA_SENDER_ID', 'Notify');
         // Correction de l'URL basée sur le retour d'erreur
         $this->baseUrl = env('YELLIKA_API_URL', 'https://app.1smsafrica.com/api/v3/sms/send');
     }

@@ -68,9 +68,9 @@
         </div>
     </div>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#services__container').css('display', 'none');
-            $('#department').change(function() {
+            $('#department').change(function () {
                 var department = $(this).val();
                 var services = $('#services__body__container');
                 services.empty();
@@ -82,22 +82,22 @@
                         url: '{{ route('hospital.service.service.search', ':id') }}'.replace(
                             ':id', department),
                         type: 'GET',
-                        success: function(response) {
-                            $.each(response, function(key, service) {
+                        success: function (response) {
+                            $.each(response, function (key, service) {
 
                                 services.append(
                                     `<tr>
-                                <td>${service.libelle}<input type="hidden" name="service[]" value="${service.id}" /></td>
-                                <td><input type="number" class="form-control" name="prix[]" /></td>
-                                <td><textarea class="form-control" name="description[]" ></textarea></td>
-                            </tr>`
+                                        <td>${service.libelle}<input type="hidden" name="service[]" value="${service.id}" /></td>
+                                        <td><input type="number" class="form-control" name="prix[]" /></td>
+                                        <td><textarea class="form-control" name="description[]" ></textarea></td>
+                                    </tr>`
                                 );
 
                             });
                             $('#services__container').css('display', 'block');
 
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             console.error(error);
                         }
                     });

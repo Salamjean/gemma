@@ -162,10 +162,10 @@ class AgentRepository
         $doctor->address = $request->address;
 
         /*verify
-        * gyneco && specialiste
-        * || specialiste
-        * || other
-        */
+         * gyneco && specialiste
+         * || specialiste
+         * || other
+         */
         if ($type == 'specialiste' && $doctor->gyneco == '1')
             $doctor->type_doctor_id = null;
         elseif ($type == 'specialiste')
@@ -245,4 +245,5 @@ class AgentRepository
         $planning->save();
 
         return ['status' => 'success', 'message' => 'Infirmier(e) ajouté(e) avec succès.'];
-    }}
+    }
+}

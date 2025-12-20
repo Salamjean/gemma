@@ -174,7 +174,6 @@
                                     </div>
                                 </div>
                                 <div class="box-footer text-end">
-
                                     <button type="submit" class="btn btn-primary">
                                         <i class="ti-save-alt"></i> Modifier les données
                                     </button>

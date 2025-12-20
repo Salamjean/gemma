@@ -37,14 +37,14 @@
 
             const sage = document.getElementById('sage');
         @else
-            const medecin = document.getElementById('medecin');
+                            const me        decin = document.getElementById('medecin');
             const radioInputs = document.querySelectorAll('input[type="radio"]');
 
             const type = document.getElementById('type_name')
             const gynecoContainer = document.getElementById('gynecoContainer');
             const specialiste = document.getElementById('specialiste');
 
-            type.addEventListener("change", function(e) {
+            type.addEventListener("change", function (e) {
 
                 if (type.value === 'specialiste') {
 
@@ -91,8 +91,8 @@
     </script>
 
     <script>
-        $(document).ready(function() {
-            $('#service').change(function() {
+        $(document).ready(function () {
+            $('#service').change(function () {
                 var department = $(this).val();
                 var services = $('#services__body__container');
                 services.empty();
@@ -102,8 +102,8 @@
                         url: '{{ route('hospital.service.data.service.search', ':id') }}'.replace(
                             ':id', department),
                         type: 'GET',
-                        success: function(response) {
-                            $.each(response, function(key, service) {
+                        success: function (response) {
+                            $.each(response, function (key, service) {
 
                                 services.append(
                                     `<option value="${service.id}">${service.prestation_service.libelle}</option>`
@@ -111,7 +111,7 @@
 
                             });
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             console.error(error);
                         }
                     });

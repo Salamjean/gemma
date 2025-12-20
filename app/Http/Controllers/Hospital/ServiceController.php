@@ -30,7 +30,7 @@ class ServiceController extends Controller
         $service = ServiceHospital::findOrFail($id);
         $servicei = Service::findOrFail($service->service_id);
         $title = "Détails | $service->libelle";
-        return view('users.hospital.service.show', compact('service','servicei', 'title'));
+        return view('users.hospital.service.show', compact('service', 'servicei', 'title'));
     }
 
     public function add()
@@ -40,7 +40,7 @@ class ServiceController extends Controller
         $serviceHospital = ServiceHospital::where('hospital_id', Auth::user()->hospital->id)->get();
 
         $id = [];
-        foreach ($serviceHospital as $key => $service){
+        foreach ($serviceHospital as $key => $service) {
             $id[$key] = $service->service_id;
         }
 
@@ -48,9 +48,8 @@ class ServiceController extends Controller
 
         $services = Service::orderBy("libelle")->get();
 
-        foreach ($services as $key => $service)
-        {
-            if(!in_array($service->id, $id))
+        foreach ($services as $key => $service) {
+            if (!in_array($service->id, $id))
                 $filters[$key] = $service;
         }
 

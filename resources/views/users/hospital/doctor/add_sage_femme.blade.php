@@ -171,8 +171,8 @@
 
     </div>
     <div class="box-footer text-end">
-        <button type="reset" class="btn btn-warning me-1">
-            <i class="ti-trash"></i> Annuler
+        <button type="button" class="btn btn-warning me-1" onclick="history.back()">
+            <i class="ti-arrow-left"></i> Annuler
         </button>
         <button type="submit" class="btn btn-primary">
             <i class="ti-save-alt"></i> Enregister

@@ -27,8 +27,8 @@
                         <label for="name" class="form-label">Nom & Prénom(s)<span
                                 class="text-danger fw-bold">*</span></label>
                         <input type="text" id="name" name="name"
-                            class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}"
-                            required autocomplete="name" autofocus placeholder="Nom & prénoms du medecin">
+                            class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required
+                            autocomplete="name" autofocus placeholder="Nom & prénoms du medecin">
                         @error('name')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -166,8 +166,8 @@
                 <div class="form-group">
                     <label class="form-label">E-mail<span class="text-danger fw-bold">*</span></label>
                     <input type="email" id="email" name="email"
-                        class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}"
-                        required autocomplete="email" placeholder="Adresse email">
+                        class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required
+                        autocomplete="email" placeholder="Adresse email">
                     @error('email')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
@@ -215,9 +215,10 @@
     </div>
     <!-- /.box-body -->
     <div class="box-footer text-end">
-        <button type="reset" class="btn btn-warning me-1">
-            <i class="ti-trash"></i> Annuler
+        <button type="button" class="btn btn-warning me-1" onclick="history.back()">
+            <i class="ti-arrow-left"></i> Annuler
         </button>
+
         <button type="submit" class="btn btn-primary">
             <i class="ti-save-alt"></i> Enregister
         </button>

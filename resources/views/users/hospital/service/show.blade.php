@@ -26,8 +26,8 @@
                             <h4 class="box-title text-success pt-10"><i class="ti-pencil me-15"></i> Modifier les données
                             </h4>
                             <hr class="my-0"><br>
-                            <form class="form" action="{{ route('hospital.service.update', $service->id) }}"
-                                method="post" enctype="multipart/form-data">
+                            <form class="form" action="{{ route('hospital.service.update', $service->id) }}" method="post"
+                                enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
                                 <div class="row">
@@ -61,7 +61,8 @@
                                                                     value="{{ $item->prix }}" name="prixupdate[]" />
                                                             </td>
                                                             <td>
-                                                                <textarea class="form-control" name="descriptionupdate[]">{{ $item->description }}</textarea>
+                                                                <textarea class="form-control"
+                                                                    name="descriptionupdate[]">{{ $item->description }}</textarea>
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -98,10 +99,11 @@
                                                                             <input type="hidden" name="service[]"
                                                                                 value="{{ $item->id }}" />
                                                                         </td>
-                                                                        <td><input type="number" class="form-control"
-                                                                                name="prix[]" /></td>
+                                                                        <td><input type="number" class="form-control" name="prix[]" />
+                                                                        </td>
                                                                         <td>
-                                                                            <textarea class="form-control" name="description[]"></textarea>
+                                                                            <textarea class="form-control"
+                                                                                name="description[]"></textarea>
                                                                         </td>
                                                                     </tr>
                                                                 @endif
