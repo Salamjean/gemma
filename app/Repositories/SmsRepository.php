@@ -17,11 +17,16 @@ class SmsRepository
         $this->phone = $phone;
         $this->message = $message;
 
-        // Récupération des identifiants Yéllika depuis le .env
-        $this->apiKey = env('YELLIKA_API_KEY');
+        // Récupération des identifiants Yéllika depuis le .env (avec trim pour éviter les espaces invisibles)
+        $this->apiKey = trim(env('YELLIKA_API_KEY'));
         $this->senderId = env('YELLIKA_SENDER_ID', 'Notify');
-        // Correction de l'URL basée sur le retour d'erreur
-        $this->baseUrl = env('YELLIKA_API_URL', 'https://app.1smsafrica.com/api/v3/sms/send');
+        // On récupère la base URL (ex: https://app.1smsafrica.com/api/v3)
+        $this->baseUrl = rtrim(env('YELLIKA_API_URL', 'https://app.1smsafrica.com/api/v3'), '/');
+
+        // Log de vérification de la clé (sans l'afficher entièrement pour sécurité)
+        $len = strlen($this->apiKey);
+        $maskedKey = substr($this->apiKey, 0, 4) . '...' . substr($this->apiKey, -4);
+        \Illuminate\Support\Facades\Log::info("Vérification clé API: $maskedKey (Lon: $len)");
     }
 
     public function send()
@@ -39,7 +44,7 @@ class SmsRepository
         }
 
         // Endpoint V3 standard pour l'envoi de SMS
-        $url = "https://app.1smsafrica.com/api/v3/sms/send";
+        $url = $this->baseUrl . "/sms/send";
 
         // Paramètres pour l'API V3 (POST JSON)
         $data = [
@@ -58,13 +63,15 @@ class SmsRepository
             "Authorization: Bearer " . $this->apiKey,
             "Content-Type: application/json",
             "Accept: application/json",
-            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         ]);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
 
         $response = curl_exec($ch);
         $error = curl_error($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $effectiveUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        $redirectUrl = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
 
         curl_close($ch);
 
@@ -72,7 +79,7 @@ class SmsRepository
             \Illuminate\Support\Facades\Log::error("1smsafrica Curl Error: $error");
             return ['success' => false, 'error' => $error];
         } else {
-            \Illuminate\Support\Facades\Log::info("1smsafrica Response ($httpCode): $response");
+            \Illuminate\Support\Facades\Log::info("1smsafrica Response ($httpCode) at $effectiveUrl (Redirect: $redirectUrl): $response");
             return ['success' => true, 'response' => $response];
         }
     }

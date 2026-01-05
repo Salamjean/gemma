@@ -101,11 +101,12 @@ class AuthController extends Controller
                 // Instancier le SmsRepository avec le numéro et le message
                 // Attention : SmsRepository ajoute déjà +225, assurez-vous que $patient->telephone est au bon format (sans indicatif ou adapté)
                 $sms = new SmsRepository($patient->telephone, $message);
-                $sms->send();
+                $response = $sms->send();
 
-                Log::info('OTP envoyé par SMS', [
+                Log::info('Tentative d\'envoi OTP par SMS', [
                     'patient_id' => $patient->id,
-                    'telephone' => $patient->telephone
+                    'telephone' => $patient->telephone,
+                    'response' => $response
                 ]);
             } catch (\Exception $e) {
                 Log::error('Erreur lors de l\'envoi de l\'OTP par SMS', [
