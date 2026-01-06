@@ -23,8 +23,8 @@
 							<div class=""
 								style="position: absolute; border-radius:100%; background-color:white; top:13%; left:2%;">
 								@if ($patient->img_url != null)
-									<img src="{{ asset('public/assets/uploads/patient/' . $patient->img_url) }}"
-										class="rounded-circle" alt="Photo de profil" style="width:128px; height:128px" />
+									<img src="{{ asset('assets/uploads/patient/' . $patient->img_url) }}" class="rounded-circle"
+										alt="Photo de profil" style="width:128px; height:128px" />
 								@else
 									@if ($patient->gender == 'masculin')
 										<img src="{{ asset('assets/images/avatar/6.png') }}" class="rounded-circle"

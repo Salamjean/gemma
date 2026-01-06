@@ -73,9 +73,8 @@
 
                         <div class="patient-photo-container">
                             @if ($patient->img_url)
-                                <img src="{{ asset('public/assets/uploads/patient/' . $patient->img_url) }}"
-                                    class="patient-photo" alt="Photo"
-                                    onerror="this.onerror=null; this.src='{{ asset($avatar) }}';">
+                                <img src="{{ asset('assets/uploads/patient/' . $patient->img_url) }}" class="patient-photo"
+                                    alt="Photo" onerror="this.onerror=null; this.src='{{ asset($avatar) }}';">
                             @else
                                 <img src="{{ asset($avatar) }}" class="patient-photo" alt="Photo">
                             @endif
@@ -146,39 +145,39 @@
             if (qb) qb.innerHTML = "";
 
             if (typeof QRCode !== 'undefined') {
-                var qrText = 
+                var qrText =
                     "DM:{{ $patient->code_patient }}\n" +
-                    "Nom:{{ optional($patient->user)->name ?? '' }}\n" +  
-                    "Prenom:{{ optional($patient->user)->prenom ?? '' }}\n" + 
-                    "Tel:{{ $patient->telephone ?? '' }}"; 
+                    "Nom:{{ optional($patient->user)->name ?? '' }}\n" +
+                    "Prenom:{{ optional($patient->user)->prenom ?? '' }}\n" +
+                    "Tel:{{ $patient->telephone ?? '' }}";
 
                 // var qrText = "{{ $patient->code_patient }}|{{ optional($patient->user)->name ?? '' }}|{{ optional($patient->user)->prenom ?? '' }}|{{ $patient->telephone ?? '' }}";
-                
+
                 console.log("Texte raccourci:", qrText);
                 console.log("Longueur du texte:", qrText.length);
 
                 new QRCode(qf, {
                     text: qrText,
-                    width: 70, 
+                    width: 70,
                     height: 70,
-                    colorDark: "#000000", 
+                    colorDark: "#000000",
                     colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.L  
+                    correctLevel: QRCode.CorrectLevel.L
                 });
 
                 new QRCode(qb, {
                     text: qrText,
-                    width: 90, 
+                    width: 90,
                     height: 90,
-                    colorDark: "#000000", 
+                    colorDark: "#000000",
                     colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.L  
+                    correctLevel: QRCode.CorrectLevel.L
                 });
 
                 setTimeout(() => {
                     document.querySelectorAll(".qrcode-container img, .qr-box img").forEach(img => {
                         img.style.margin = "auto";
-                        img.style.display = "block"; 
+                        img.style.display = "block";
                     });
                 }, 100);
             }

@@ -46,7 +46,7 @@
 
                                 <td>
                                     @if ($patient->img_url != null)
-        								<img src="{{ asset('public/assets/uploads/patient/'. $patient->img_url) }}"
+        								<img src="{{ asset('assets/uploads/patient/'. $patient->img_url) }}"
         									class="rounded-circle" alt="Photo de profil" style="width:48px; height:48px" />
         							@else
         							    @if ($patient->gender == 'masculin')
